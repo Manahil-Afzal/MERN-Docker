@@ -1,18 +1,29 @@
 import { styles } from "@/app/styles/style";
-import { url } from "inspector";
-import { title } from "process";
 import React, { FC, useState } from "react";
 import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
 import { BsLink45Deg, BsPencil } from "react-icons/bs";
-import { MdDescription, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import toast from "react-hot-toast";
+
+interface Link {
+  title: string;
+  url: string;
+}
+
+interface CourseContentItem {
+  videoUrl: string;
+  title: string;
+  description: string;
+  videoSection: string;
+  links: Link[];
+}
 
 type Props = {
   active: number;
   setActive: (active: number) => void;
-  courseContentData: any;
-  setCourseContentData: (courseContentData: any) => void;
-  handleSubmit: any;
+  courseContentData: CourseContentItem[];
+  setCourseContentData: (courseContentData: CourseContentItem[]) => void;
+  handleSubmit: () => void;
 };
 
 const CourseContent: FC<Props> = ({
@@ -26,7 +37,7 @@ const CourseContent: FC<Props> = ({
     ? courseContentData
     : [];
 
-  const safeLinks = (item: any) =>
+  const safeLinks = (item: Partial<CourseContentItem> | null | undefined) =>
     Array.isArray(item?.links) && item.links.length > 0
       ? item.links
       : [{ title: "", url: "" }];
@@ -40,7 +51,7 @@ const CourseContent: FC<Props> = ({
     Array(safeCourseContentData.length).fill(false)
   );
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
@@ -64,7 +75,7 @@ const CourseContent: FC<Props> = ({
       setCourseContentData(updatedData);
   };
 
-  const newContentHandler = (item:any) =>{
+  const newContentHandler = (item: CourseContentItem) => {
     const itemLinks = safeLinks(item);
     if(item.title === "" || item.description === "" || item.videoUrl === "" || itemLinks[0].title === "" || itemLinks[0].url === ""){
         toast.error("Please fill all the fields!");
@@ -149,7 +160,7 @@ const CourseContent: FC<Props> = ({
   return (
     <div className="w-[80%] m-auto mt-24 p-3">
       <form onSubmit={handleSubmit}>
-        {safeCourseContentData.map((item: any, index: number) => {
+        {safeCourseContentData.map((item: CourseContentItem, index: number) => {
           const showSectionInput =
             index === 0 ||
             item.videoSection !== safeCourseContentData[index - 1].videoSection;
@@ -270,7 +281,7 @@ const CourseContent: FC<Props> = ({
                     <br />
                   </div>
 
-                  {safeLinks(item).map((link: any, linkIndex: number) => (
+                  {safeLinks(item).map((link: Link, linkIndex: number) => (
                     <div className="mb-3 block" key={linkIndex}>
                       <div className="w-full flex items-center justify-between">
                         <label className={styles.label}>Link {linkIndex + 1}</label>
@@ -325,7 +336,7 @@ const CourseContent: FC<Props> = ({
               {index === safeCourseContentData.length - 1 && (
                 <div>
                     <p className="flex items-center text-[18px] dark:text-white text-black cursor-pointer"
-                     onClick={(e:any) => newContentHandler(item)}
+                     onClick={() => newContentHandler(item)}
                     >
                   <AiOutlinePlusCircle className="mr-2" /> 
                     Add new Content

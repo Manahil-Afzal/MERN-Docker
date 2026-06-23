@@ -6,9 +6,7 @@ import AdminProtected from '../../hooks/adminProtected';
 import DashboardHero from "@/app/components/Admin/DashboardHero";
 import EditFaq from "../../components/Admin/Customization/EditFaq";
 
-type Props = {};
-
-const page = (props: Props) => {
+const Page = () => {
   return (
     <div>
       <AdminProtected>
@@ -31,4 +29,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;

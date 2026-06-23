@@ -4,11 +4,7 @@ import AdminSidebar from '../../../app/components/Admin/sidebar/AdminSidebar';
 import Heading from '../../../app/utils/Heading';
 import DashboardHeader from '../../../app/components/Admin/DashboardHeader';
 import EditCategories from '../../../app/components/Admin/Customization/EditCategories';
-import { useParams } from 'next/navigation';
-
 const Page = () => {
-     const params = useParams<{ id: string }>();
-     const id = params?.id || "";
   return (
     <div>
       <Heading 

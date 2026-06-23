@@ -34,7 +34,7 @@ export const apiSlice = createApi({
               user: result.data.user,
             }),
           );
-        } catch (error: any) {
+        } catch (error) {
           console.log(error);
         }
       },

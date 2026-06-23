@@ -6,9 +6,7 @@
  import React from "react";
  import AllUsers from "../../components/Admin/Users/AllUsers";
  
- type Props = {};
- 
- const page = (props: Props) => {
+ const Page = () => {
    return (
      <div>
        <AdminProtected>
@@ -31,5 +29,5 @@
    );
  };
  
- export default page;
+ export default Page;
  

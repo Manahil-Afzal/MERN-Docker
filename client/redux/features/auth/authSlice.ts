@@ -7,7 +7,7 @@ interface User {
     email: string;
     role: string;
     isVerified: boolean;
-    courses: any[];
+    courses: unknown[];
 }
 
 interface AuthState {

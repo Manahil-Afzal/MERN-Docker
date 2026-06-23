@@ -6,7 +6,11 @@ type RegistrationResponse ={
     activationToken: string;
 };
 
-type RegistrationData = {};
+type RegistrationData = {
+    name?: string;
+    email?: string;
+    password?: string;
+};
 
 export const authApi = apiSlice.injectEndpoints({
      endpoints: (builder) =>({
@@ -26,7 +30,7 @@ export const authApi = apiSlice.injectEndpoints({
                             token: result.data.activationToken,
                         })
                     );
-                } catch (error:any) {
+                } catch (error) {
                     console.log(error);
                 }
             }
@@ -60,7 +64,7 @@ export const authApi = apiSlice.injectEndpoints({
                             user: result.data.user,
                         })
                     );
-                } catch (error:any) {
+                } catch (error) {
                     console.log(error);
                 }
             },
@@ -85,7 +89,7 @@ export const authApi = apiSlice.injectEndpoints({
                             user: result.data.user,
                         })
                     );
-                } catch (error:any) {
+                } catch (error) {
                     console.log(error);
                 }
             },
@@ -103,7 +107,7 @@ export const authApi = apiSlice.injectEndpoints({
                     dispatch(
                         userLoggedOut(),
                     );
-                } catch (error:any) {
+                } catch (error) {
                     console.log(error);
                 }
             },

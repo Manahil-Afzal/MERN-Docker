@@ -5,8 +5,8 @@ import { Modal, Box } from "@mui/material";
 type Props = {
     open: boolean;
     setOpen: (open: boolean) => void;
-    activeItem?: any;
-    component: any;
+    activeItem?: unknown;
+    component: React.ComponentType<{ setOpen: (open: boolean) => void; setRoute?: (route: string) => void }>;
     setRoute?: (route: string) => void;
 }
 
@@ -15,6 +15,7 @@ const CustomModal: FC<Props> = ({ open, setOpen, setRoute, component: Component 
 
     // Ensure the modal only attempts to render on the client
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

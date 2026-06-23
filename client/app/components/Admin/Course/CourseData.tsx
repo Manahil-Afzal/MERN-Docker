@@ -20,7 +20,7 @@ const CourseData:FC<Props> = ({
      active,
      setActive,
 }) => {
-    const handleBenefitsChange = (index:number, value:any) => {
+    const handleBenefitsChange = (index:number, value:string) => {
         const updatedBenefits = [...benefits];
         updatedBenefits[index].title = value;
         setBenefits(updatedBenefits);
@@ -30,7 +30,7 @@ const CourseData:FC<Props> = ({
         setBenefits([...benefits, {title: ""}]);
     };
 
-     const handlePrerequisitesChange = (index:number, value:any) => {
+     const handlePrerequisitesChange = (index:number, value:string) => {
         const updatedPrerequisites = [...prerequisites];
         updatedPrerequisites[index].title = value;
         setPrerequisites(updatedPrerequisites);
@@ -61,14 +61,14 @@ const CourseData:FC<Props> = ({
             </label>
             <br />
             {
-                benefits.map((benefits: any, index:number) => (
+                benefits.map((benefit: {title: string}, index:number) => (
                     <input type="text"
                       key={index}
                       name='Benefits'
                       placeholder='You will be able to build  CI/CD pipelines for seamless software delivery...'
                       required
                       className={`${styles.input} my-2`}
-                      value={benefits.title}
+                      value={benefit.title}
                       onChange={(e) => handleBenefitsChange(index, e.target.value)}
                     />
                 ))
@@ -85,14 +85,14 @@ const CourseData:FC<Props> = ({
             </label>
             <br />
             {
-                prerequisites.map((prerequisites: any, index:number) => (
+                prerequisites.map((prerequisite: {title: string}, index:number) => (
                     <input type="text"
                       key={index}
                       name='prerequisites'
                       placeholder='You need basic knowledge of Dev Ops.'
                       required
                       className={`${styles.input} my-2`}
-                      value={prerequisites.title}
+                      value={prerequisite.title}
                       onChange={(e) => handlePrerequisitesChange(index, e.target.value)}
                     />
                 ))

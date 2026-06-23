@@ -14,6 +14,20 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
+interface Link {
+  title: string;
+  url: string;
+}
+
+interface CourseContentItem {
+  videoUrl: string;
+  title: string;
+  description: string;
+  videoSection: string;
+  links: Link[];
+  suggestion?: string;
+}
+
 type Props = {
   isEdit?: boolean;
   courseId?: string;
@@ -26,7 +40,7 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
   const [editCourse, { isLoading: isUpdating, isSuccess: updateSuccess, error: updateError }] =
     useEditCourseMutation();
 
-  const { data: singleCourseData, isLoading: isFetchingCourse } =
+  const { isLoading: isFetchingCourse } =
     useGetSingleCourseQuery(courseId, {
       skip: !isEdit || !courseId,
     });
@@ -49,7 +63,7 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
 
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
-  const [courseContentData, setCourseContentData] = useState<any[]>([]);
+  const [courseContentData, setCourseContentData] = useState<CourseContentItem[]>([]);
   const [courseData, setCourseData] = useState({});
 
   useEffect(() => {
@@ -65,7 +79,7 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
 
     const error = createError || updateError;
     if (error && "data" in error) {
-      toast.error((error as any).data?.message || "Something went wrong");
+      toast.error((error as { data?: { message?: string } }).data?.message || "Something went wrong");
     }
   }, [createSuccess, updateSuccess, createError, updateError, router]);
 

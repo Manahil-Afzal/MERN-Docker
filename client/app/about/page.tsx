@@ -1,19 +1,19 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { useState } from "react";
 import Heading from "../utils/Heading";
 import Header from "../components/Header";
 import { useSelector } from "react-redux";
-import Profile from "../components/Profile/Profile";
-import { UseSelector } from "react-redux";
 import About from "./About";
 
-type Props = {};
+interface LoggedInUser {
+  name: string;
+}
 
-const Page: FC<Props> = (props) => {
+const Page = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(2);
+  const activeItem = 2;
   const [route, setRoute] = useState("Login");
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: { auth: { user: LoggedInUser | null } }) => state.auth);
 
   return (
     <div>

@@ -58,7 +58,7 @@ const toEmbedUrl = (value: string) => {
     return value;
 };
 
-const CoursePlayer:FC<Props> = ({videoUrl}) => {
+const CoursePlayer:FC<Props> = ({videoUrl, title}) => {
      const [videoData, setVideoData] = useState({
         otp: "",
         playbackInfo: "",
@@ -66,10 +66,11 @@ const CoursePlayer:FC<Props> = ({videoUrl}) => {
          const [loading, setLoading] = useState(false);
          const [error, setError] = useState(false);
 
-useEffect(() => {
-    const source = normalizeVideoSource(videoUrl || "");
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useEffect(() => {
+        const source = normalizeVideoSource(videoUrl || "");
 
-    if (!source) {
+        if (!source) {
             setVideoData({ otp: "", playbackInfo: "" });
             setLoading(false);
             setError(true);
@@ -85,18 +86,24 @@ useEffect(() => {
 
         setLoading(true);
         setError(false);
-    axios
-    .post(`${(process.env.NEXT_PUBLIC_SERVER_URI || "https://zylo-learning.vercel.app/api/v1/").replace(/\/$/, "")}/getVdoCipherOTP`,{
-        videoId: source,
-    }).then((res) => {
-        setVideoData(res.data);
-        setLoading(false);
-    }).catch(() => {
-            setVideoData({ otp: "", playbackInfo: "" });
-            setLoading(false);
-            setError(true);
-        });
-},[videoUrl])
+        axios
+            .post(
+                `${(process.env.NEXT_PUBLIC_SERVER_URI || "https://zylo-learning.vercel.app/api/v1/").replace(/\/$/, "")}/getVdoCipherOTP`,
+                {
+                    videoId: source,
+                }
+            )
+            .then((res) => {
+                setVideoData(res.data);
+                setLoading(false);
+            })
+            .catch(() => {
+                setVideoData({ otp: "", playbackInfo: "" });
+                setLoading(false);
+                setError(true);
+            });
+    }, [videoUrl]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const source = normalizeVideoSource(videoUrl || "");
   const directLink = isDirectUrl(source);
@@ -131,6 +138,7 @@ useEffect(() => {
 
         {directLink && isEmbeddableIframeUrl(source) && (
             <iframe
+                title={title}
                 src={iframeSource}
                 style={{
                     border: 0,
@@ -147,6 +155,7 @@ useEffect(() => {
 
         {showOtpPlayer && (
                 <iframe
+                 title={title}
                  src={`https://player.vdocipher.com/v2/?otp=${videoData?.otp}&playbackInfo=${videoData.playbackInfo}&player=48WmoWnrXpDM04cy`}
                   style={{
                     border: 0,

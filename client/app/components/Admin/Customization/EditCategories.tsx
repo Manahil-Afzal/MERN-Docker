@@ -9,7 +9,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { toast } from "react-hot-toast";
 
-type Props = {};
+
 
 type CategoryRow = {
   _id?: string;
@@ -26,7 +26,7 @@ const createCategoryRow = (category: Partial<CategoryRow> = {}): CategoryRow => 
   title: category.title || "",
 });
 
-const EditCategories = (props: Props) => {
+const EditCategories = () => {
   const { data, isLoading, refetch } = useGetHeroDataQuery("Categories", {
     refetchOnMountOrArgChange: true,
   });
@@ -38,9 +38,10 @@ const EditCategories = (props: Props) => {
 
   useEffect(() => {
     if (data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCategories(
         Array.isArray(data?.layout?.categories)
-          ? data.layout.categories.map((c: any) => createCategoryRow(c))
+          ? data.layout.categories.map((c: Partial<CategoryRow>) => createCategoryRow(c))
           : []
       );
     }
@@ -51,7 +52,7 @@ const EditCategories = (props: Props) => {
     }
 
     if (error && "data" in error) {
-      const errorData = error as any;
+      const errorData = error as { data?: { message?: string } };
       toast.error(errorData?.data?.message);
     }
   }, [data, layoutSuccess, error, refetch]);
@@ -78,20 +79,20 @@ const EditCategories = (props: Props) => {
     setCategories((prev) => [...prev, createCategoryRow()]);
   };
 
-  const areCategoriesUnchanged = (a: any[] = [], b: any[] = []) =>
+  const areCategoriesUnchanged = (a: Partial<CategoryRow>[] = [], b: Partial<CategoryRow>[] = []) =>
     JSON.stringify(a) === JSON.stringify(b);
 
-  const isAnyCategoryTitleEmpty = (items: any[] = []) =>
+  const isAnyCategoryTitleEmpty = (items: Partial<CategoryRow>[] = []) =>
     items.some((item) => item.title === "");
 
   const editCategoriesHandler = async () => {
     if (
-      !areCategoriesUnchanged(data?.layout?.categories ?? [], categories) &&
+      !areCategoriesUnchanged(data?.layout?.categories ?? [], categories.map((c) => ({ _id: c._id, title: c.title }))) &&
       !isAnyCategoryTitleEmpty(categories)
     ) {
       await editLayout({
         type: "Categories",
-        categories: categories.map(({ uid, ...rest }) => rest),
+        categories: categories.map((c) => ({ _id: c._id, title: c.title })),
       });
     }
   };

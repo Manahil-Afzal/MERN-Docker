@@ -12,27 +12,21 @@ import Loader from "../../Loader/Loader";
 import { useGetCoursesAnalyticsQuery } from "@/redux/features/analytics/analyticsApi";
 import { styles } from "@/app/styles/style";
 
-type Props = {};
+interface AnalyticsItem {
+  name: string;
+  uv: number;
+}
 
-const CourseAnalytics = (props: Props) => {
+const CourseAnalytics = () => {
   const { data, isLoading } = useGetCoursesAnalyticsQuery({});
 
-//   const analyticsData = [
-//       { name: 'Jun 2023', uv: 3 },
-//       { name: 'July 2023', uv: 2 },
-//       { name: 'August 2023', uv: 5 },
-//       { name: 'Sept 2023', uv: 7 },
-//       { name: 'October 2023', uv: 2 },
-//       { name: 'Nov 2023', uv: 5 },
-//       { name: 'December 2023', uv: 7 },
-//     ];
+  const analyticsData: AnalyticsItem[] = [];
 
-  const analyticsData: any = [];
-
-  data &&
-    data.courses.last12Months.forEach((item: any) => {
+  if (data) {
+    data.courses.last12Months.forEach((item: { month: string; count: number }) => {
       analyticsData.push({ name: item.month, uv: item.count });
     });
+  }
 
   const minValue = 0;
 
