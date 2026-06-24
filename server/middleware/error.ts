@@ -1,41 +1,51 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import ErrorHandler from "../utils/ErrorHandler.js";
 
+type AppError = {
+  name?: string;
+  message?: string;
+  statusCode?: number;
+  code?: number;
+  path?: string;
+  keyValue?: Record<string, unknown>;
+};
+
 export const ErrorMiddleware = (
-    err:any, 
-    req:Request, 
-    res:Response, 
-    next:NextFunction
+  err: unknown,
+  req: Request,
+  res: Response
 ) => {
-    err.statusCode = err.statusCode || 500;
-    err.message = err.message || "internal server error";
+  const error = err as AppError;
 
-    //wrong mongodb id error
-    if(err.name === 'CastError'){
-        const message = `Resource not found. Invalid: ${err.path}`;
-        err = new ErrorHandler(message,400);
-    }
+  const statusCode = error.statusCode || 500;
+  const message = error.message || "internal server error";
 
-    // Duplicate Key error
-    if(err.code === 11000){
-        const message = `Duplicate ${Object.keys(err.keyValue)} entered`;
-        err = new ErrorHandler(message, 400);
-    }
+  let finalError = new ErrorHandler(message, statusCode);
 
-    // wrong jwt error
-    if(err.name === 'JsonWebTokenError'){
-        const message = `json web token is invalid, try again`;
-        err = new ErrorHandler(message,400);
-    }
+  if (error.name === "CastError") {
+    finalError = new ErrorHandler(
+      `Resource not found. Invalid: ${error.path}`,
+      400
+    );
+  }
 
-    // JWT Expire error
-    if(err.name === 'TokenExpiredError'){
-        const message = `json web token is expired , try again`;
-        err = new ErrorHandler(message, 400);
-    }
+  if (error.code === 11000) {
+    finalError = new ErrorHandler(
+      `Duplicate ${Object.keys(error.keyValue || {})} entered`,
+      400
+    );
+  }
 
-    res.status(err.statusCode).json({
-        success:false,
-        message:err.message
-    })
-}
+  if (error.name === "JsonWebTokenError") {
+    finalError = new ErrorHandler("JWT is invalid, try again", 400);
+  }
+
+  if (error.name === "TokenExpiredError") {
+    finalError = new ErrorHandler("JWT is expired, try again", 400);
+  }
+
+  return res.status(finalError.statusCode).json({
+    success: false,
+    message: finalError.message,
+  });
+};

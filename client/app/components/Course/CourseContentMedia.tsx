@@ -19,12 +19,37 @@ import socketIO from "socket.io-client";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "http://localhost:8000";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
+type CourseLink = {
+  url?: string;
+  href?: string;
+  link?: string;
+  videoUrl?: string;
+  title?: string;
+};
+
+type CourseLesson = {
+  _id?: string;
+  title?: string;
+  description?: string;
+  videoUrl?: string;
+  videoPlayer?: string;
+  questions?: unknown[];
+  links?: CourseLink[];
+};
+
+type CourseUser = {
+  _id: string;
+  role?: string;
+  avatar?: { url?: string };
+  name?: string;
+};
+
 type Props = {
-  data: any;
+  data: CourseLesson[];
   id: string;
   activeVideo: number;
   setActiveVideo: (activeVideo: number) => void;
-  user?: any;
+  user?: CourseUser;
   refetch?: () => void;
 };
 
@@ -52,8 +77,10 @@ const getAvatarUrl = (person: { avatar?: { url?: string } } | undefined) =>
   person?.avatar?.url ??
   "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png";
 
-const getLinkUrl = (link: any) =>
-  String(link?.url || link?.href || link?.link || link?.videoUrl || "").trim();
+const getLinkUrl = (link: unknown) => {
+  const l = link as Record<string, unknown>;
+  return String(l?.url || l?.href || l?.link || l?.videoUrl || "").trim();
+};
 
 const toExternalHref = (value: string) => {
   const url = value.trim();
@@ -82,18 +109,19 @@ const isPlayableVideoLink = (value: string) => {
   );
 };
 
-const getMutationErrorMessage = (mutationError: any) => {
+const getMutationErrorMessage = (mutationError: unknown) => {
   if (!mutationError || typeof mutationError !== "object") {
     return "";
   }
 
-  const data = (mutationError as any).data;
+  const err = mutationError as Record<string, unknown>;
+  const data = err.data;
   if (data && typeof data === "object" && "message" in data) {
-    return String((data as any).message || "");
+    return String((data as Record<string, unknown>).message || "");
   }
 
-  if ("error" in mutationError) {
-    return String((mutationError as any).error || "");
+  if ("error" in err) {
+    return String(err.error || "");
   }
 
   return "";
@@ -158,10 +186,6 @@ const CourseContentMedia = ({
     },
   ] = useAddReplyMutation();
 
-  const isReviewExists = course?.reviews?.find(
-    (item: any) => item.user._id === user?._id
-  );
-
   const handleQuestion = () => {
     if (question.length === 0) {
       toast.error("Question can't be empty");
@@ -176,25 +200,25 @@ const CourseContentMedia = ({
 
   useEffect(() => {
     if (isSuccess) {
-      setQuestion("");
+      setTimeout(() => { setQuestion(""); }, 0);
       refetch?.();
       toast.success("Question submitted successfully");
       socketId.emit("notification", {
         title: `New Question Received`,
         message: `You have a new question  reply in ${data[activeVideo].title}`,
-        userId: user._id,
+        userId: user?._id,
       })
       resetQuestionMutation();
     }
     if (answerSuccess) {
-      setAnswer("");
+      setTimeout(() => { setAnswer(""); }, 0);
       refetch?.();
       toast.success("Reply submitted successfully");
-      if(user.role !== "admin"){
+      if(user?.role !== "admin"){
          socketId.emit("notification", {
         title: `New Reply Received`,
         message: `Yi=ou have a new Reply in ${data[activeVideo].title}`,
-        userId: user._id,
+        userId: user?._id,
       });
       }
       resetAnswerMutation();
@@ -210,14 +234,13 @@ const CourseContentMedia = ({
       resetAnswerMutation();
     }
     if (reviewSuccess) {
-      setReview("");
-      setRating(1);
+      setTimeout(() => { setReview(""); setRating(1); }, 0);
       courseRefetch();
       toast.success("Review submitted successfully");
       socketId.emit("notification", {
         title: `New Question Received`,
         message: `Yi=ou have a new question in ${data[activeVideo].title}`,
-        userId: user._id,
+        userId: user?._id,
       })
       resetReviewMutation();
     }
@@ -227,7 +250,7 @@ const CourseContentMedia = ({
       resetReviewMutation();
     }
     if (replySuccess) {
-      setReply("");
+      setTimeout(() => { setReply(""); }, 0);
       courseRefetch();
       toast.success("Reply added successfully");
       resetReplyMutation();
@@ -252,6 +275,9 @@ const CourseContentMedia = ({
     resetAnswerMutation,
     resetReviewMutation,
     resetReplyMutation,
+    activeVideo,
+    data,
+    user,
   ]);
 
   const handleAnswerSubmit = () => {
@@ -284,13 +310,13 @@ const CourseContentMedia = ({
   const totalLessons = Array.isArray(data) ? data.length : 0;
   const currentLesson = data?.[activeVideo];
   const resourceVideoLink = currentLesson?.links
-    ?.map((link: any) => getLinkUrl(link))
+    ?.map((link: CourseLink) => getLinkUrl(link))
     ?.find((url: string) => isPlayableVideoLink(url));
   const isPrevDisabled = totalLessons <= 0 || activeVideo <= 0;
   const isNextDisabled = totalLessons <= 0 || activeVideo >= totalLessons - 1;
 
   useEffect(() => {
-    setSelectedResourceUrl("");
+    setTimeout(() => { setSelectedResourceUrl(""); }, 0);
   }, [activeVideo]);
 
   const goToPreviousLesson = () => {
@@ -425,7 +451,7 @@ const CourseContentMedia = ({
 
       {activeBar === 1 && (
         <div>
-          {(data[activeVideo]?.links || []).map((item: any, index: number) => {
+          {(data[activeVideo]?.links || []).map((item: CourseLink, index: number) => {
             const linkUrl = getLinkUrl(item);
             const isVideoResource = isPlayableVideoLink(linkUrl);
             const isSelectedVideo = selectedResourceUrl === linkUrl;
@@ -603,7 +629,7 @@ const CourseContentMedia = ({
               </div>
 
               {isReviewsOpen && (course?.reviews && [...course.reviews].reverse())?.map(
-                (item: any, index: number) => {
+                (item: { _id?: string; user?: { _id?: string; name?: string; avatar?: { url?: string } }; rating?: number; comment?: string; createdAt?: string; commentReplies?: Array<{ _id?: string; user?: { name?: string; avatar?: { url?: string }; role?: string }; comment?: string; createdAt?: string }> }, index: number) => {
                   
                   return (
                     <div className="w-full my-5 dark:text-white text-black" key={index}>
@@ -651,7 +677,7 @@ const CourseContentMedia = ({
                             type="text"
                             placeholder="Enter your reply..."
                             value={reply}
-                            onChange={(e: any) => setReply(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReply(e.target.value)}
                             className="block mt-2 outline-none bg-transparent border-b border-purple-400/30 dark:text-white text-black dark:border-purple-300/40 p-[5px] w-[95%]"
                           />
                           <button
@@ -666,7 +692,7 @@ const CourseContentMedia = ({
 
                       {item.commentReplies.length > 0 && (
                         <div className="w-full mt-3 ml-6 800px:ml-20 pl-4 800px:pl-6 border-l-2 border-purple-400/30">
-                          {item.commentReplies.map((i: any, index: number) => (
+                          {item.commentReplies.map((i: { _id?: string; user?: { name?: string; avatar?: { url?: string } }; comment?: string; createdAt?: string }, index: number) => (
                             <div className="w-full flex my-5 text-black dark:text-white" key={i?._id || i?.createdAt || `review-reply-${item?._id || "review"}-${index}`}>
                               <div className="w-[50px] h-[50px]">
                                 <Image
@@ -703,6 +729,17 @@ const CourseContentMedia = ({
   );
 };
 
+type CommentReplyProps = {
+  data: CourseLesson[];
+  activeVideo: number;
+  answer: string;
+  setAnswer: (v: string) => void;
+  handleAnswerSubmit: () => void;
+  questionId: string;
+  setQuestionId: (id: string) => void;
+  answerCreationLoading: boolean;
+};
+
 const CommentReply = ({
   data,
   activeVideo,
@@ -712,11 +749,11 @@ const CommentReply = ({
   questionId,
   setQuestionId,
   answerCreationLoading,
-}: any) => {
+}: CommentReplyProps) => {
   return (
     <>
       <div className="w-full my-3">
-        {data[activeVideo]?.questions?.map((item: any, index: any) => (
+        {data[activeVideo]?.questions?.map((item: { _id?: string; [key: string]: unknown }, index: number) => (
           <CommentItem
             key={item?._id || `question-${index}`}
             data={data}
@@ -736,6 +773,22 @@ const CommentReply = ({
   );
 };
 
+type CommentItemProps = {
+  questionId: string;
+  setQuestionId: (id: string) => void;
+  item: {
+    _id: string;
+    question?: string;
+    createdAt?: string;
+    user?: { name?: string; avatar?: { url?: string } };
+    questionReplies: Array<{ _id?: string; answer?: string; createdAt?: string; updatedAt?: string; user?: { name?: string; avatar?: { url?: string }; role?: string } }>;
+  };
+  answer: string;
+  setAnswer: (v: string) => void;
+  handleAnswerSubmit: () => void;
+  answerCreationLoading: boolean;
+};
+
 const CommentItem = ({
   questionId,
   setQuestionId,
@@ -744,7 +797,7 @@ const CommentItem = ({
   setAnswer,
   handleAnswerSubmit,
   answerCreationLoading,
-}: any) => {
+}: CommentItemProps) => {
   const [replyActive, setreplyActive] = useState(false);
   return (
     <>
@@ -792,7 +845,7 @@ const CommentItem = ({
 
         {replyActive && questionId === item._id &&  (
           <div className="w-full mt-3 ml-6 800px:ml-20 pl-4 800px:pl-6 border-l-2 border-purple-400/30">
-            {item.questionReplies?.map((replyItem: any, replyIndex: number) => (
+            {item.questionReplies?.map((replyItem: { _id?: string; answer?: string; createdAt?: string; updatedAt?: string; user?: { name?: string; avatar?: { url?: string }; role?: string } }, replyIndex: number) => (
               <div
                 className="w-full flex my-5 text-black dark:text-white"
                 key={replyItem?._id || replyItem?.createdAt || `reply-${item?._id || "question"}-${replyIndex}`}
@@ -827,7 +880,7 @@ const CommentItem = ({
                   type="text"
                   placeholder="Enter your answer..."
                   value={answer}
-                  onChange={(e: any) => setAnswer(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswer(e.target.value)}
                   className={`block mt-2 outline-none bg-transparent border-b border-purple-400/30 dark:text-white text-black dark:border-purple-300/40 p-[5px] w-[95%] ${
                     answer === "" ||
                     (answerCreationLoading && "cursor-not-allowed")

@@ -5,16 +5,16 @@ import { useUpdatePasswordMutation } from "@/redux/features/user/userApi";
 import toast from "react-hot-toast";
 
 type Props = {
-  avatar: string | null;
-  user: any;
+  avatar?: string | null;
+  user?: unknown;
 };
 
-const ChangePassword: FC<Props> = ({ avatar, user }) => {
+const ChangePassword: FC<Props> = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [updatePassword, {isSuccess,error}] = useUpdatePasswordMutation();
-  const passwordChangeHandler = async(e:any) => {
+  const passwordChangeHandler = async(e: React.FormEvent<HTMLFormElement>) => {
      e.preventDefault();
      if( newPassword !== confirmPassword){
         toast.error("Passwords do not match");
@@ -27,14 +27,16 @@ const ChangePassword: FC<Props> = ({ avatar, user }) => {
   useEffect(() =>{
       if(isSuccess){
         toast.success("Password changed successfully");
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
+        setTimeout(() => {
+          setOldPassword("");
+          setNewPassword("");
+          setConfirmPassword("");
+        }, 0);
       }
       if(error){
         if("data" in error){
-            const errorData = error as any;
-            toast.error(errorData.data.message);
+            const errorData = error as { data?: { message?: string } };
+            toast.error(errorData?.data?.message || "Failed to update password");
         }
       }
   }, [isSuccess, error])

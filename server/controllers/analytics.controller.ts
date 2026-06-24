@@ -6,49 +6,59 @@ import userModel from "../models/user.model.js";
 import CourseModel from "../models/course.model.js";
 import OrderModel from "../models/orderModel.js";
 
-// get user analytics ---only for admin
-export const getUsersAnalytics = CatchAsyncError(async(req: Request, res: Response, next: NextFunction) =>{
+// Get Users Analytics --- Admin Only
+export const getUsersAnalytics = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const users = await generateLast12MonthsData(userModel);
-        
-        res.status(200).json({
+      const users = await generateLast12MonthsData(userModel);
+
+      res.status(200).json({
         success: true,
-         users,
-       });
-    } catch (error:any) {
-        return next(new ErrorHandler(error.message, 500));
+        users,
+      });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
+
+      return next(new ErrorHandler(message, 500));
     }
-});
+  }
+);
 
-
-
-// get user analytics ---only for admin
+// Get Courses Analytics --- Admin Only
 export const getCoursesAnalytics = CatchAsyncError(
-    async(req: Request, res: Response, next: NextFunction) =>{
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const courses = await generateLast12MonthsData(CourseModel);
-        
-        res.status(200).json({
+      const courses = await generateLast12MonthsData(CourseModel);
+
+      res.status(200).json({
         success: true,
-         courses,
-       });
-    } catch (error:any) {
-        return next(new ErrorHandler(error.message, 500));
+        courses,
+      });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
+
+      return next(new ErrorHandler(message, 500));
     }
-});
+  }
+);
 
-
-//  get user analytics ---only for admin
+// Get Orders Analytics --- Admin Only
 export const getOrdersAnalytics = CatchAsyncError(
-    async(req: Request, res: Response, next: NextFunction) =>{
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const orders = await generateLast12MonthsData(OrderModel);
-        
-        res.status(200).json({
+      const orders = await generateLast12MonthsData(OrderModel);
+
+      res.status(200).json({
         success: true,
-         orders,
-       });
-    } catch (error:any) {
-        return next(new ErrorHandler(error.message, 500));
+        orders,
+      });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
+
+      return next(new ErrorHandler(message, 500));
     }
-});
+  }
+);

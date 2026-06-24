@@ -4,12 +4,12 @@ import CoursePlayer from "@/app/utils/CoursePlayer";
 import Ratings from "@/app/utils/Ratings";
 import React, { useState } from "react";
 import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
-import { BiMessage } from "react-icons/bi";
+
 import CourseContentList from "../Course/CourseContentList";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "../Payment/CheckoutForm";
 import { Stripe } from "@stripe/stripe-js";
-import Link from "next/link";
+
 import { styles } from "@/app/styles/style";
 import Image from "next/image";
 
@@ -67,11 +67,8 @@ type Props = {
 };
 
 const CourseDetails = (props: Props) => {
-  const { data, stripePromise, clientSecret, open, setOpen } = props;
+  const { data, stripePromise, clientSecret } = props;
   const [openPayment, setOpenPayment] = useState(false); // Independent state
-  const [activeReviewReplyId, setActiveReviewReplyId] = useState<string | null>(
-    null
-  );
 
   const discountPercentage = data?.estimatedPrice
     ? ((data.estimatedPrice - data.price) / data.estimatedPrice) * 100

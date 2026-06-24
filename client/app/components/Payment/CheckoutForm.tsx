@@ -19,21 +19,20 @@ const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
   setOpen: (value: boolean) => void;
-  user?: any;
   data: {
     _id: string;
     name?: string;
   };
 };
 
-const CheckoutForm = ({ setOpen, data, user }: Props) => {
+const CheckoutForm = ({ setOpen, data }: Props) => {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState<string>("");
   const [createOrder, { data: orderData, error }] = useCreateOrderMutation();
   const [isLoading, setIsLoading] = useState(false);
-  const {data:userData} = useLoadUserQuery(undefined, { skip: true });
+  useLoadUserQuery(undefined, { skip: true });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,9 +100,8 @@ const CheckoutForm = ({ setOpen, data, user }: Props) => {
     if (error && "data" in error) {
       const errorMessage = error as { data?: { message?: string } };
       toast.error(errorMessage?.data?.message || "Order creation failed");
-      setIsLoading(false);
     }
-  }, [orderData, error, data?._id, router, setOpen]);
+  }, [orderData, error, data?._id, data.name, router, setOpen]);
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>

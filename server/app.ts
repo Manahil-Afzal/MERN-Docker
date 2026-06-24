@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -12,43 +9,38 @@ import orderRouter from "./routes/order.route.js";
 import notificationRouter from "./routes/notification.route.js";
 import analyticsRouter from "./routes/analytics.route.js";
 import layoutRouter from "./routes/layout.route.js";
-import connectDB from "./utils/db.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export const app = express();
+
 app.set("trust proxy", 1);
 
-// body parser
+// Body Parser
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// cookie parser
+// Cookie Parser
 app.use(cookieParser());
 
-// cors => cross origin resource sharing
-const allowedOrigins = process.env.CLIENT_URL
-  ? [process.env.CLIENT_URL]
-  : ["https://zylo-app-plum.vercel.app"];
+// CORS
+app.use(
+  cors({
+    origin:
+      process.env.CLIENT_URL || "https://zylo-app-plum.vercel.app",
+    credentials: true,
+  })
+);
 
-app.use(cors({
-   origin: process.env.CLIENT_URL || "https://zylo-app-plum.vercel.app",
-  credentials: true,
-}));
-
-// api request limit
+// API Rate Limit
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
 });
 
 app.use(limiter);
 
-
-// routes
+// Routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/courses", courseRouter);
 app.use("/api/v1/orders", orderRouter);
@@ -56,28 +48,32 @@ app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/analytics", analyticsRouter);
 app.use("/api/v1/layout", layoutRouter);
 
-// Testing Api
-app.get("/", (req: Request, res: Response, _next: NextFunction) => {
-    res.status(200).json({
-        success: true,
-        message: "API is running",
-    });
+// Home Route
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "API is running",
+  });
 });
 
-app.get("/test", (req: Request, res: Response, _next: NextFunction) => {
-    res.status(200).json({
-        success: true,
-        message: "API is working",
-    });
+// Test Route
+app.get("/test", (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "API is working",
+  });
 });
 
-// unknown route
+// Unknown Route Handler
 app.use((req: Request, _res: Response, next: NextFunction) => {
-    const err = new Error(`Route ${req.originalUrl} not found`) as any;
-    err.statusCode = 404;
-    next(err);
+  const err = new Error(
+    `Route ${req.originalUrl} not found`
+  ) as Error & { statusCode?: number };
+
+  err.statusCode = 404;
+
+  next(err);
 });
 
-// middleware calls
+// Error Middleware
 app.use(ErrorMiddleware);
-

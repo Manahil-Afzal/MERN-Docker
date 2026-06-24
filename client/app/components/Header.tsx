@@ -14,7 +14,6 @@ import { useSelector } from "react-redux";
 import Image from "next/image";
 import avatar from "../../public/assests/avatar.png";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
 import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import { toast } from "react-hot-toast";
 
@@ -26,56 +25,55 @@ type Props = {
   setRoute: (route: string) => void;
 };
 
-const Header: FC<Props> = ({
-  activeItem,
-  route,
-  setOpen,
-  open,
-  setRoute,
-}) => {
+interface User {
+  avatar?: {
+    url?: string;
+  };
+}
+
+const Header: FC<Props> = ({ activeItem, route, setOpen, open, setRoute }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const [active, setActive] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  const { user } = useSelector((state: any) => state.auth);
-  const pathname = usePathname();
+  const { user } = useSelector(
+    (state: { auth: { user: User | null } }) => state.auth,
+  );
   const { data } = useSession();
 
   const [socialAuth, { isSuccess }] = useSocialAuthMutation();
-  const [logout, setLogout] = useState(false);
 
   useEffect(() => {
     if (!user && data) {
       socialAuth({
-        email: data?.user?.email,
-        name: data?.user?.name,
-        avatar: data?.user?.image,
+        email: data?.user?.email || "",
+        name: data?.user?.name || "",
+        avatar: data?.user?.image || "",
       });
     }
 
     if (data === null && isSuccess) {
       toast.success("Login Successfully");
     }
-
-    if (data === null) {
-      setLogout(true);
-    }
-  }, [data, user]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  }, [data, user, isSuccess, socialAuth]);
 
   useEffect(() => {
     const handleScroll = () => {
       setActive(window.scrollY > 80);
     };
 
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  if (!mounted) return null;
+  const imageSrc =
+    typeof user?.avatar?.url === "string" && user.avatar.url
+      ? user.avatar.url
+      : avatar;
 
   return (
     <div className="w-full relative">
@@ -113,17 +111,11 @@ const Header: FC<Props> = ({
               {user ? (
                 <Link href="/profile">
                   <Image
-                    src={user.avatar ? user.avatar.url : avatar}
+                    src={imageSrc}
                     alt="User avatar"
                     width={30}
                     height={30}
                     className="w-[30px] h-[30px] rounded-full cursor-pointer object-cover"
-                    style={{
-                      border:
-                        pathname === "/profile"
-                          ? "2px solid #8B5CF6"
-                          : "none",
-                    }}
                   />
                 </Link>
               ) : (

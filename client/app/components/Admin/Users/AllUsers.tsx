@@ -8,8 +8,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import Loader from "../../Loader/Loader";
 import { format } from "timeago.js";
 import {
-  useAddMemberMutation,
-  useDeleteUserMutation,
   useGetAllUsersQuery,
 } from "@/redux/features/user/userApi";
 
@@ -18,7 +16,7 @@ type Props = {
   isTeam?: boolean;
 };
 
-const AllUsers: FC<Props> = ({ isTeam = false }) => {
+const AllUsers: FC<Props> = () => {
   const { theme } = useTheme();
 
   const [active, setActive] = useState(false);
@@ -33,14 +31,10 @@ const AllUsers: FC<Props> = ({ isTeam = false }) => {
 
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
 
-  type UsersQueryResult = {
-    users?: UserRow[];
-  };
 
   const { isLoading, data } = useGetAllUsersQuery({});
 
-  const [addMember] = useAddMemberMutation();
-  const [deleteUser] = useDeleteUserMutation();
+
 
 
   type Row = {
@@ -75,7 +69,7 @@ const AllUsers: FC<Props> = ({ isTeam = false }) => {
       field: "delete",
       headerName: "Delete",
       flex: 0.2,
-      renderCell: (params: { row: Row }) => (
+      renderCell: () => (
         <Button onClick={() => setDeleteTarget(null)}>
           <AiOutlineDelete className="text-black dark:text-white" size={20} />
         </Button>

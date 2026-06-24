@@ -1,5 +1,6 @@
 'use client'
-import React, {FC, useState} from "react"
+
+import React, { useState } from "react";
 import Heading from "./utils/Heading";
 import Header from "./components/Header";
 import Hero from "./components/Route/Hero";
@@ -8,35 +9,34 @@ import Reviews from "./components/Route/Reviews";
 import FAQ from "./components/FAQ/FAQ";
 import Footer from "./components/Footer";
 
+const Page = () => {
+  const [open, setOpen] = useState(false);
+  const activeItem = 6;
+  const [route, setRoute] = useState("Login");
 
-interface Props{}
+  return (
+    <div>
+      <Heading
+        title="ZyLO"
+        description="ZyLo is a platform for students to learn and get Help from teachers"
+        keywords="Programming,MERN,Redux, Devops, Machine Learning"
+      />
 
-const Page: FC<Props> = (props) => {
-   const [open, setOpen] = useState(false);
-   const [activeItem, setActiveItem] = useState(6);
-   const [route, setRoute] = useState("Login");
+      <Header
+        open={open}
+        setOpen={setOpen}
+        activeItem={activeItem}
+        setRoute={setRoute}
+        route={route}
+      />
 
-  return(
-      <div>
-          <Heading
-              title="ZyLO"
-              description= "ZyLo is a platform for students to learn and get Help from teachers"
-              keywords= "Programming,MERN,Redux, Devops, Machine Learning"
-         />
-         <Header
-           open={open}
-           setOpen={setOpen}
-           activeItem={activeItem}
-           setRoute={setRoute}
-           route={route}
-         />
-         <Hero />
-         <Courses/>
-         <Reviews/>
-         <FAQ/>
-         <Footer />
-      </div>
-  )
+      <Hero />
+      <Courses />
+      <Reviews />
+      <FAQ />
+      <Footer />
+    </div>
+  );
 };
 
-export default  Page;             
+export default Page;

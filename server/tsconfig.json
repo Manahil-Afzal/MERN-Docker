@@ -16,6 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "eslinit.config.js"],
   "exclude": ["node_modules", "dist"]
 }

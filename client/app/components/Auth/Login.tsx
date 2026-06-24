@@ -50,7 +50,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, redirectTo}) => {
 
             }
         }
-      }, [isSuccess, isError, error, setOpen]);  
+      }, [isSuccess, isError, error, setOpen, redirectTo, router]);  
 
     const { errors, touched, values, handleChange, handleSubmit } = formik;
 

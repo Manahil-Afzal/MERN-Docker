@@ -6,6 +6,7 @@ import {
 	useGetHeroDataQuery,
 } from "@/redux/features/layout/layoutApi";
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { AiOutlineCamera } from "react-icons/ai";
 import { HiOutlineSearch } from "react-icons/hi";
@@ -102,10 +103,12 @@ const EditHero = () => {
 					{/* IMAGE SECTION */}
 					<div className="flex justify-center">
 						<div className="relative w-full max-w-[560px] aspect-4/3 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-							<img
+							<Image
 								src={currentImage}
 								alt="Hero banner"
-								className="h-full w-full object-cover transition duration-300 dark:brightness-75"
+								fill
+								unoptimized
+								className="object-cover transition duration-300 dark:brightness-75"
 							/>
 
 							<input

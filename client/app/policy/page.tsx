@@ -1,15 +1,14 @@
 "use client";
-import React, { FC, useState } from "react";
+
+import React, { useState } from "react";
 import Heading from "../utils/Heading";
 import Header from "../components/Header";
 import Policy from "./Policy";
 import Footer from "../components/Footer";
 
-type Props = {};
-
-const Page: FC<Props> = (props: Props) => {
+const Page = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(2);
+  const activeItem = 2;
   const [route, setRoute] = useState("Login");
 
   return (
@@ -19,6 +18,7 @@ const Page: FC<Props> = (props: Props) => {
         description="ZyLO is a plateform for students to learn and get help from Teachers"
         keywords="Programming, MERN, Redux, Machine Learning"
       />
+
       <Header
         open={open}
         setOpen={setOpen}
@@ -26,6 +26,7 @@ const Page: FC<Props> = (props: Props) => {
         setRoute={setRoute}
         route={route}
       />
+
       <Policy />
       <Footer />
     </div>

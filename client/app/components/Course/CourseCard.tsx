@@ -19,7 +19,7 @@ type Props = {
   item: CourseCardItem;
   isProfile?: boolean;
   compact?: boolean;
-  user?: any;
+  user?: unknown;
 };
 
 const CourseCard: FC<Props> = ({ item, isProfile, compact = false }) => {

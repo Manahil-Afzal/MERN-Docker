@@ -6,9 +6,8 @@ import React from "react";
 import AdminSidebar from "../../app/components/Admin/sidebar/AdminSidebar";
 import EditFaq from "../../app/components/Admin/Customization/EditFaq";
 
-type Props = {};
 
-const page = (props: Props) => {
+const Page = () => {
   return (
     <div>
       <AdminProtected>
@@ -32,4 +31,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
