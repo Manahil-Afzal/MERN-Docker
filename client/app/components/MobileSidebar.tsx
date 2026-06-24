@@ -12,7 +12,10 @@ type Props = {
   activeItem: number;
   open: boolean;
   setOpen: (open: boolean) => void;
-  user?: any;
+  user?: {
+    avatar?: { url: string } | null;
+  } | null;
+
   setRoute?: (route: string) => void;
   setOpenModal?: (open: boolean) => void;
 };

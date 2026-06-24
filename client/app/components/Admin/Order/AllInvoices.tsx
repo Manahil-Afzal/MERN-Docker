@@ -20,6 +20,26 @@ type Props = {
   isDashboard?: boolean;
 };
 
+type OrderRow = {
+  _id: string;
+  userId: string;
+  courseId: string;
+  createdAt: string | Date;
+};
+
+type UserRow = {
+  _id: string;
+  name?: string;
+  email?: string;
+};
+
+type CourseRow = {
+  _id: string;
+  name?: string;
+  price?: number;
+};
+
+
 const AllInvoices = (props: Props) => {
   const { theme } = useTheme();
   const { isDashboard } = props;
@@ -33,9 +53,13 @@ const AllInvoices = (props: Props) => {
     const users = usersData?.users ?? [];
     const courses = coursesData?.courses ?? [];
 
-    return orders.map((item: any) => {
-      const user = users.find((u: any) => u._id === item.userId);
-      const course = courses.find((c: any) => c._id === item.courseId);
+    return (orders as OrderRow[]).map((item: OrderRow) => {
+      const user = (users as UserRow[]).find((u: UserRow) => u._id === item.userId);
+
+      const course =
+        (courses as CourseRow[]).find((c: CourseRow) => c._id === item.courseId);
+
+
 
       return {
         id: item._id,
@@ -68,8 +92,9 @@ const AllInvoices = (props: Props) => {
             field: "email",
             headerName: "Email",
             flex: 0.2,
-            renderCell: (params: GridRenderCellParams<any>) => (
-              <a href={`mailto:${params.row.userEmail}`}>
+            renderCell: (params: GridRenderCellParams<{ userEmail?: string }>) => (
+              <a href={`mailto:${params.row.userEmail ?? ""}`}>
+
                 <AiOutlineMail className="text-black dark:text-white" size={20} />
               </a>
             ),

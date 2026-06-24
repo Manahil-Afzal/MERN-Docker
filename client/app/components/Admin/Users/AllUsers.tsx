@@ -12,7 +12,7 @@ import {
   useDeleteUserMutation,
   useGetAllUsersQuery,
 } from "@/redux/features/user/userApi";
-import { toast } from "react-hot-toast";
+
 
 type Props = {
   isTeam?: boolean;
@@ -22,22 +22,45 @@ const AllUsers: FC<Props> = ({ isTeam = false }) => {
   const { theme } = useTheme();
 
   const [active, setActive] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  type UserRow = {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+    courses?: unknown[];
+    createdAt: string | Date;
+  };
 
-  const { isLoading, data, refetch } = useGetAllUsersQuery({}) as any;
+  const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
 
-  const [addMember, { isLoading: isAddingMember }] = useAddMemberMutation();
-  const [deleteUser, { isLoading: isDeletingUser }] = useDeleteUserMutation();
+  type UsersQueryResult = {
+    users?: UserRow[];
+  };
 
-  const rows =
-    data?.users?.map((item: any) => ({
+  const { isLoading, data } = useGetAllUsersQuery({});
+
+  const [addMember] = useAddMemberMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
+
+  type Row = {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    courses: number;
+    created_at: string;
+  };
+
+  const rows: Row[] =
+    data?.users?.map((item) => ({
       id: item._id,
       name: item.name,
       email: item.email,
       role: item.role,
-      courses: item.courses?.length || 0,
+      courses: item.courses?.length ?? 0,
       created_at: format(item.createdAt),
-    })) || [];
+    })) ?? [];
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
@@ -47,12 +70,13 @@ const AllUsers: FC<Props> = ({ isTeam = false }) => {
     { field: "courses", headerName: "Courses", flex: 0.5 },
     { field: "created_at", headerName: "Joined", flex: 0.5 },
 
+
     {
       field: "delete",
       headerName: "Delete",
       flex: 0.2,
-      renderCell: (params: any) => (
-        <Button onClick={() => setDeleteTarget(params.row)}>
+      renderCell: (params: { row: Row }) => (
+        <Button onClick={() => setDeleteTarget(null)}>
           <AiOutlineDelete className="text-black dark:text-white" size={20} />
         </Button>
       ),
@@ -61,12 +85,13 @@ const AllUsers: FC<Props> = ({ isTeam = false }) => {
       field: "email_action",
       headerName: "Email",
       flex: 0.2,
-      renderCell: (params: any) => (
+      renderCell: (params: { row: Row }) => (
         <Button component="a" href={`mailto:${params.row.email}`}>
           <AiOutlineMail className="text-black dark:text-white" size={20} />
         </Button>
       ),
     },
+
   ];
 
   return (

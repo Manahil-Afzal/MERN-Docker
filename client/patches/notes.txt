@@ -1,0 +1,1 @@
+Tooling reassessment notes: remaining lint errors are concentrated in CourseContentMedia, Header, MobileSidebar, AllUsers, and other components/pages. Fix strategy: replace `any` with typed interfaces and remove setState calls from useEffect bodies by moving state updates into event handlers or derived state, or by using refs + conditional rendering.

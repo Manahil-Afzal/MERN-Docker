@@ -29,10 +29,11 @@ const Signup: FC<Props> = ({ setRoute }) => {
             setRoute("verification");
         }
         if(error){
-            const errorData = error as any;
+            const errorData = error as unknown as { data?: { message?: string }; error?: string };
             const message =
-                errorData?.data?.message ||
-                errorData?.error ||
+                errorData.data?.message ||
+                errorData.error ||
+
                 "Unable to register right now. Please check the server connection.";
 
             toast.error(message);
