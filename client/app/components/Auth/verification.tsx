@@ -34,11 +34,11 @@ const Verification: FC<Props> = ({ setRoute }) => {
             if ('data' in error) {
                 const errorData = error as unknown as { data?: { message?: string } };
                 toast.error(errorData.data?.message || 'Verification failed');
-                setInvalidError(true);
             } else {
                 console.log('An error occured:', error);
             }
         }
+
     }, [isSuccess, error]);
 
     useEffect(() => {
