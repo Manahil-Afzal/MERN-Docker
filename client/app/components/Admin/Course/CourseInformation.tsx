@@ -1,18 +1,12 @@
+"use client";
+
 import { styles } from "@/app/styles/style";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, Dispatch, SetStateAction } from "react";
 
-interface CourseInfo {
-  name: string;
-  description: string;
-  price: string | number;
-  estimatedPrice?: string | number;
-  tags: string;
-  categories: string;
-  level: string;
-  demoUrl: string;
-  thumbnail: string;
-}
+/* ---------------- TYPES ---------------- */
+
+import { CourseInfo } from "@/types/course";
 
 interface Category {
   _id: string;
@@ -21,10 +15,12 @@ interface Category {
 
 type Props = {
   courseInfo: CourseInfo;
-  setCourseInfo: (courseInfo: CourseInfo) => void;
+  setCourseInfo: Dispatch<SetStateAction<CourseInfo>>;
   active: number;
   setActive: (active: number) => void;
 };
+
+/* ---------------- COMPONENT ---------------- */
 
 const CourseInformation: FC<Props> = ({
   courseInfo,
@@ -33,37 +29,47 @@ const CourseInformation: FC<Props> = ({
   setActive,
 }) => {
   const [dragging, setDragging] = useState(false);
-  const {data} = useGetHeroDataQuery("Categories", {});
+  const { data } = useGetHeroDataQuery("Categories", {});
   const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() =>{
-     if(data){
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCategories(data.layout.categories);
-     }
-  },[data])
+  /* ---------------- LOAD CATEGORIES ---------------- */
 
-    const hasCategoryOptions = categories.length > 0;
+  useEffect(() => {
+    if (data) {
+      setCategories(data.layout.categories);
+    }
+  }, [data]);
+
+  const hasCategoryOptions = categories.length > 0;
+
+  /* ---------------- FORM SUBMIT ---------------- */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setActive(active + 1);
   };
 
+  /* ---------------- FILE UPLOAD ---------------- */
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
+    if (!file) return;
 
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setCourseInfo({ ...courseInfo, thumbnail: reader.result });
-        }
-      };
+    const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-    }
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCourseInfo((prev) => ({
+          ...prev,
+          thumbnail: reader.result,
+        }));
+      }
+    };
+
+    reader.readAsDataURL(file);
   };
+
+  /* ---------------- DRAG EVENTS ---------------- */
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -80,235 +86,211 @@ const CourseInformation: FC<Props> = ({
     setDragging(false);
 
     const file = e.dataTransfer.files?.[0];
+    if (!file) return;
 
-    if (file) {
-      const reader = new FileReader();
+    const reader = new FileReader();
 
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setCourseInfo({ ...courseInfo, thumbnail: reader.result });
-        }
-      };
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCourseInfo((prev) => ({
+          ...prev,
+          thumbnail: reader.result,
+        }));
+      }
+    };
 
-      reader.readAsDataURL(file);
-    }
+    reader.readAsDataURL(file);
   };
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="w-[80%] m-auto mt-40">
-      <form onSubmit={handleSubmit} className={`${styles.label}`}>
-        <div>
-          <label htmlFor="">Course Name</label>
-          <input
-            type="name"
-            name=""
+      <form onSubmit={handleSubmit} className={styles.label}>
+
+        {/* COURSE NAME */}
+        <label>Course Name</label>
+        <input
+          type="text"
+          required
+          value={courseInfo.name}
+          onChange={(e) =>
+            setCourseInfo({ ...courseInfo, name: e.target.value })
+          }
+          className={styles.input}
+        />
+
+        {/* DESCRIPTION */}
+        <div className="mb-5 mt-8">
+          <label className={styles.label}>Course Description</label>
+          <textarea
+            rows={8}
             required
-            value={courseInfo.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setCourseInfo({ ...courseInfo, name: e.target.value })
+            value={courseInfo.description}
+            onChange={(e) =>
+              setCourseInfo({
+                ...courseInfo,
+                description: e.target.value,
+              })
             }
-            id="name"
-            placeholder="MERN Stack LMS Plateform with next 13"
-            className={`${styles.input}`}
+            className={`${styles.input} h-min! py-2!`}
           />
-          <br />
+        </div>
 
-          <div className="mb-5 mt-8">
-            <label className={`${styles.label}`}>Course Description</label>
-            <textarea
-              name=""
-              id=""
-              cols={30}
-              rows={8}
-              placeholder="Write something amazing....."
-              className={`${styles.input} h-min! py-2!`}
-              value={courseInfo.description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setCourseInfo({ ...courseInfo, description: e.target.value })
+        {/* PRICE */}
+        <div className="w-full flex flex-wrap gap-6 justify-between">
+          <div className="w-full md:w-[48%]">
+            <label className={styles.label}>Course Price</label>
+            <input
+              type="number"
+              required
+              value={courseInfo.price}
+              onChange={(e) =>
+                setCourseInfo({ ...courseInfo, price: e.target.value })
               }
-            ></textarea>
+              className={styles.input}
+            />
           </div>
-          <br />
 
-          <div className="w-full flex flex-wrap gap-6 justify-between">
-            <div className="w-full md:w-[48%]">
-              <label className={`${styles.label}`}>Course Prize</label>
-              <input
-                type="number"
-                name=""
-                required
-                value={courseInfo.price}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCourseInfo({ ...courseInfo, price: e.target.value })
-                }
-                id="price"
-                placeholder="29"
-                className={`${styles.input}`}
-              />
-            </div>
-
-            <div className="w-full md:w-[48%]">
-              <label className={styles.label}>Estimated Price (Optional)</label>
-              <input
-                type="number"
-                name=""
-                value={courseInfo.estimatedPrice}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCourseInfo({
-                    ...courseInfo,
-                    estimatedPrice: e.target.value,
-                  })
-                }
-                id="estimated-price"
-                placeholder="60"
-                className={`${styles.input}`}
-              />
-            </div>
+          <div className="w-full md:w-[48%]">
+            <label className={styles.label}>Estimated Price</label>
+            <input
+              type="number"
+              value={courseInfo.estimatedPrice}
+              onChange={(e) =>
+                setCourseInfo({
+                  ...courseInfo,
+                  estimatedPrice: e.target.value,
+                })
+              }
+              className={styles.input}
+            />
           </div>
-          <br />
-          <div className="w-full flex justify-between">
-            <div className="w-[45%]">
-              <label className="text-black dark:text-white" htmlFor="email">
-              Course Tags
-            </label>
+        </div>
+
+        {/* TAGS + CATEGORY */}
+        <div className="w-full flex justify-between mt-5">
+          <div className="w-[45%]">
+            <label className={styles.label}>Tags</label>
             <input
               type="text"
               required
-              name=""
               value={courseInfo.tags}
-               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 setCourseInfo({ ...courseInfo, tags: e.target.value })
               }
-              id="tags"
-              placeholder="MERN, Next 13, Socket io, tailwind css, LMS"
-              className={`${styles.input} placeholder:text-black/50 dark:placeholder:text-white/50`}
+              className={styles.input}
             />
-            </div>
-            <div className="w-[50%]">
-              <label className={`${styles.label} w-[50%]`}>Course Categories</label>
-              {hasCategoryOptions ? (
-                <select
-                  name="categories"
-                  id="categories"
-                  required
-                  className={`${styles.input} bg-white dark:bg-[#1f1f1f] text-black dark:text-white`}
-                  value={courseInfo.categories || ""}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setCourseInfo({ ...courseInfo, categories: e.target.value })
-                  }
-                >
-                  <option value="" className="bg-white dark:bg-[#1f1f1f] text-black dark:text-white">
-                    Select Category
+          </div>
+
+          <div className="w-[50%]">
+            <label className={styles.label}>Category</label>
+
+            {hasCategoryOptions ? (
+              <select
+                required
+                value={courseInfo.categories}
+                onChange={(e) =>
+                  setCourseInfo({
+                    ...courseInfo,
+                    categories: e.target.value,
+                  })
+                }
+                className={styles.input}
+              >
+                <option value="">Select Category</option>
+                {categories.map((item) => (
+                  <option key={item._id} value={item.title}>
+                    {item.title}
                   </option>
-                   {categories.map((item: Category) => (
-                    <option
-                      value={item.title}
-                      key={item._id}
-                      className="bg-white dark:bg-[#1f1f1f] text-black dark:text-white"
-                    >
-                      {item.title}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  required
-                  name="categories"
-                  id="categories"
-                  placeholder="e.g. Web Development"
-                  className={`${styles.input} bg-white dark:bg-[#1f1f1f] text-black dark:text-white`}
-                  value={courseInfo.categories || ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCourseInfo({ ...courseInfo, categories: e.target.value })
-                  }
-                />
-              )}
-              {!hasCategoryOptions && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  No saved categories found yet. Enter one manually for this first course.
-                </p>
-              )}
-            </div>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                required
+                value={courseInfo.categories}
+                onChange={(e) =>
+                  setCourseInfo({
+                    ...courseInfo,
+                    categories: e.target.value,
+                  })
+                }
+                className={styles.input}
+                placeholder="Enter category"
+              />
+            )}
           </div>
-          <br />
+        </div>
 
-          <div className="w-full flex justify-between">
-            <div className="w-[45%]">
-              <label className={`${styles.label}`}> Course Level</label>
-              <input
-                type="text"
-                name=""
-                value={courseInfo.level}
-                required
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCourseInfo({ ...courseInfo, level: e.target.value })
-                }
-                id="level"
-                placeholder="Beginner/Intermediate/Expert"
-                className={`${styles.input}`}
-              />
-            </div>
-            <div className="w-[50%]">
-              <label className={`${styles.label} w-[50%]`}>Demo Url</label>
-              <input
-                type="text"
-                name=""
-                required
-                value={courseInfo.demoUrl}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCourseInfo({ ...courseInfo, demoUrl: e.target.value })
-                }
-                id="demoUrl"
-                placeholder="eer74fd"
-                className={`${styles.input}`}
-              />
-            </div>
-          </div>
-          <br />
-          <div className="w-full">
+        {/* LEVEL + DEMO */}
+        <div className="w-full flex justify-between mt-5">
+          <div className="w-[45%]">
+            <label className={styles.label}>Level</label>
             <input
-              type="file"
-              accept="image/*"
-              id="file"
-              className="hidden"
-              onChange={handleFileChange}
+              type="text"
+              required
+              value={courseInfo.level}
+              onChange={(e) =>
+                setCourseInfo({ ...courseInfo, level: e.target.value })
+              }
+              className={styles.input}
             />
-
-            <label
-              htmlFor="file"
-              className={`w-full min-h-[10vh] dark:border-white border-[#00000026] p-6 border flex items-center justify-center ${
-                dragging ? "bg-purple-400" : "bg-transparent"
-              }`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              {courseInfo.thumbnail ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={courseInfo.thumbnail}
-                  alt=""
-                  className="max-h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-black dark:text-white ">
-                  Drag and drop your thumbnail here or click to browser
-                </span>
-              )}
-            </label>
           </div>
-          <br />
 
-          <div className="w-full flex items-center justify-end">
-             <input 
-                  type="submit" 
-                  value="Next"              
-                  className="w-[140px] h-10 bg-purple-400 hover:bg-purple-400 text-center text-white rounded mt-8 cursor-pointer transition-colors"
-                  />
+          <div className="w-[50%]">
+            <label className={styles.label}>Demo URL</label>
+            <input
+              type="text"
+              required
+              value={courseInfo.demoUrl}
+              onChange={(e) =>
+                setCourseInfo({
+                  ...courseInfo,
+                  demoUrl: e.target.value,
+                })
+              }
+              className={styles.input}
+            />
           </div>
-          <br />
-          <br />
+        </div>
+
+        {/* UPLOAD */}
+        <input
+          type="file"
+          accept="image/*"
+          id="file"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        <label
+          htmlFor="file"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`w-full min-h-[10vh] border flex items-center justify-center p-6 ${
+            dragging ? "bg-purple-300" : "bg-transparent"
+          }`}
+        >
+          {courseInfo.thumbnail ? (
+            <img
+              src={courseInfo.thumbnail}
+              alt="thumbnail"
+              className="max-h-[200px] w-full object-cover"
+            />
+          ) : (
+            <span>Drag & Drop or Click to Upload Thumbnail</span>
+          )}
+        </label>
+
+        {/* NEXT BUTTON */}
+        <div className="flex justify-end mt-5">
+          <input
+            type="submit"
+            value="Next"
+            className="w-[140px] h-10 bg-purple-400 text-white rounded cursor-pointer"
+          />
         </div>
       </form>
     </div>

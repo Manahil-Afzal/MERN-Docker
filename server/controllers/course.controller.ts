@@ -7,6 +7,7 @@ import { redis } from "../utils/redis.js";
 import userModel from "../models/user.model.js";
 import NotificationModel from "../models/notificationModel.js";
 import { Types } from "mongoose";
+import type { ICourseData, IComment } from "../models/course.model.js";
 
 type SafeObj = Record<string, unknown>;
 
@@ -170,7 +171,7 @@ export const addQuestion = CatchAsyncError(
         return next(new ErrorHandler("Course not found", 404));
       }
 
-      const content = course.courseData.find((item: SafeObj) =>
+      const content = course.courseData.find((item: ICourseData) =>
         String(item._id) === String(contentId)
       );
 
@@ -184,7 +185,7 @@ export const addQuestion = CatchAsyncError(
         questionReplies: [],
       };
 
-      (content.questions as SafeObj[]).push(newQuestion);
+      (content.questions as IComment[]).push(newQuestion);
 
       course.markModified("courseData");
 
