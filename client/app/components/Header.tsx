@@ -18,8 +18,8 @@ import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import { toast } from "react-hot-toast";
 
 type Props = {
-  open?: boolean;
-  setOpen?: (open: boolean) => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
@@ -78,11 +78,10 @@ const Header: FC<Props> = ({ activeItem, route, setOpen, open, setRoute }) => {
   return (
     <div className="w-full relative">
       <div
-        className={`${
-          active
-            ? "dark:bg-linear-to-r dark:bg-gray-800 dark:via-purple-950 dark:to-purple-700 bg-white fixed top-0 left-0 w-full h-20 z-80 border-b dark:border-purple-900 border-gray-200 shadow-xl transition duration-500"
-            : "w-full dark:bg-linear-to-r dark:bg-gray-800 dark:via-purple-950 dark:to-purple-700 bg-white border-b dark:border-purple-900 border-gray-200 h-20 z-80 shadow"
-        }`}
+        className={`${active
+          ? "dark:bg-linear-to-r dark:bg-gray-800 dark:via-purple-950 dark:to-purple-700 bg-white fixed top-0 left-0 w-full h-20 z-80 border-b dark:border-purple-900 border-gray-200 shadow-xl transition duration-500"
+          : "w-full dark:bg-linear-to-r dark:bg-gray-800 dark:via-purple-950 dark:to-purple-700 bg-white border-b dark:border-purple-900 border-gray-200 h-20 z-80 shadow"
+          }`}
       >
         <div className="w-[95%] m-auto py-2 h-full">
           <div className="w-full h-20 flex items-center justify-between p-3">

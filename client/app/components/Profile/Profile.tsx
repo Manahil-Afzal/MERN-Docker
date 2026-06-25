@@ -12,15 +12,25 @@ import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUserAllCoursesQuery } from "@/redux/features/courses/coursesApi";
 
-type UserCourse = {
+interface UserCourse {
   courseId?: string;
   _id?: string;
-};
+}
 
-type UserType = {
+interface UserType {
+  name?: string;
+  role?: string;
+  avatar?: {
+    url?: string | null;
+  } | null;
   courses?: (string | UserCourse)[];
-  [key: string]: unknown;
-};
+}
+
+interface RootState {
+  auth: {
+    user: UserType | null;
+  };
+}
 
 type Props = {
   user: UserType;
@@ -28,7 +38,15 @@ type Props = {
 
 type CourseType = {
   _id: string;
-  [key: string]: unknown;
+  name: string;
+  thumbnail: {
+    url: string;
+  };
+  ratings?: number;
+  purchased?: number;
+  price: number;
+  estimatedPrice?: number;
+  courseData?: unknown[];
 };
 
 const Profile: FC<Props> = ({ user }) => {
@@ -98,10 +116,9 @@ const Profile: FC<Props> = ({ user }) => {
           className={`transition-all duration-300 z-[999] h-max
             sticky top-[100px]
             ${active === 3 ? "mt-40" : "mt-30"}
-            ${
-              active === 3
-                ? "w-[160px] 800px:w-[390px]"
-                : "w-[160px] 800px:w-[310px]"
+            ${active === 3
+              ? "w-[160px] 800px:w-[390px]"
+              : "w-[160px] 800px:w-[310px]"
             }
             bg-white dark:bg-[#111c43] 800px:bg-transparent
             rounded-[10px] border dark:border-[#ffffff1d] 800px:border-none`}
@@ -119,9 +136,8 @@ const Profile: FC<Props> = ({ user }) => {
 
         {/* Content Area */}
         <div
-          className={`flex-1 transition-all duration-200 ${
-            active === 3 ? "mt-32" : "mt-20"
-          }`}
+          className={`flex-1 transition-all duration-200 ${active === 3 ? "mt-32" : "mt-20"
+            }`}
         >
           {active === 1 && (
             <div className="w-full">

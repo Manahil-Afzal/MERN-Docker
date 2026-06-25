@@ -6,7 +6,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { HiMinus, HiPlus } from "react-icons/hi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import toast from "react-hot-toast";
-import Loader from "../../Loader/Loader"; 
+import Loader from "../../Loader/Loader";
 
 interface FaqItem {
   _id: string;
@@ -40,7 +40,10 @@ const EditFaq = () => {
     if (error) {
       if ("data" in error) {
         const errorData = error as { data?: { message?: string } };
-        toast.error(errorData?.data?.message);
+
+        toast.error(
+          errorData?.data?.message || "Something went wrong"
+        );
       }
     }
   }, [data, layoutSuccess, error, refetch]);
@@ -108,9 +111,8 @@ const EditFaq = () => {
               {questions.map((q: FaqItem) => (
                 <div
                   key={q._id}
-                  className={`${
-                    q._id !== questions[0]?._id && "border-t"
-                  } border-gray-200 pt-6`}
+                  className={`${q._id !== questions[0]?._id && "border-t"
+                    } border-gray-200 pt-6`}
                 >
                   <dt className="text-lg">
                     <button
@@ -164,10 +166,9 @@ const EditFaq = () => {
 
           <div
             className={`${styles.button} !w-[100px] !min-h-[40px] !h-[40px] dark:text-white text-black bg-[#cccccc34] 
-              ${
-                areQuestionsUnchanged(data?.layout?.faq, questions) || isAnyQuestionEmpty(questions)
-                  ? "!cursor-not-allowed"
-                  : "!cursor-pointer !bg-purple-400"
+              ${areQuestionsUnchanged(data?.layout?.faq, questions) || isAnyQuestionEmpty(questions)
+                ? "!cursor-not-allowed"
+                : "!cursor-pointer !bg-purple-400"
               }
               !rounded fixed bottom-12 right-12`}
             onClick={

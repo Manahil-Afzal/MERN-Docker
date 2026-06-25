@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
+import React, { useEffect, useState } from "react";
 import CourseInformation from "./CourseInformation";
 import CourseOptions from "./CourseOptions";
 import CourseData from "./CourseData";
@@ -29,7 +29,7 @@ export interface CourseContentItem {
   description: string;
   videoSection: string;
   links: Link[];
-  suggestion?: string;
+  suggestion: string;
 }
 
 export interface CourseInfo {
@@ -44,6 +44,12 @@ export interface CourseInfo {
   thumbnail: string;
 }
 
+interface CourseDataType extends CourseInfo {
+  benefits: { title: string }[];
+  prerequisites: { title: string }[];
+  courseContentData: CourseContentItem[];
+}
+
 type Props = {
   isEdit?: boolean;
   courseId?: string;
@@ -53,18 +59,6 @@ type Props = {
 
 const CreateCourse = ({ isEdit = false, courseId }: Props) => {
   const router = useRouter();
-
-  const [createCourse, { isLoading: isCreating, isSuccess: createSuccess, error: createError }] =
-    useCreateCourseMutation();
-
-  const [editCourse, { isLoading: isUpdating, isSuccess: updateSuccess, error: updateError }] =
-    useEditCourseMutation();
-
-  const { isLoading: isFetchingCourse } = useGetSingleCourseQuery(courseId, {
-    skip: !isEdit || !courseId,
-  });
-
-  const [active, setActive] = useState<number>(0);
 
   const [courseInfo, setCourseInfo] = useState<CourseInfo>({
     name: "",
@@ -78,10 +72,34 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
     thumbnail: "",
   });
 
+  const [active, setActive] = useState<number>(0);
+
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
   const [courseContentData, setCourseContentData] = useState<CourseContentItem[]>([]);
-  const [courseData, setCourseData] = useState<any>({});
+  const [courseData, setCourseData] = useState<CourseDataType>();
+
+  const [
+    createCourse,
+    {
+      isLoading: isCreating,
+      isSuccess: createSuccess,
+      error: createError,
+    },
+  ] = useCreateCourseMutation();
+
+  const [
+    editCourse,
+    {
+      isLoading: isUpdating,
+      isSuccess: updateSuccess,
+      error: updateError,
+    },
+  ] = useEditCourseMutation();
+
+  const { isLoading: isFetchingCourse } = useGetSingleCourseQuery(courseId, {
+    skip: !isEdit || !courseId,
+  });
 
   /* ---------------- EFFECTS ---------------- */
 
@@ -97,23 +115,32 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
     }
 
     const error = createError || updateError;
+
     if (error && "data" in error) {
       toast.error(
         (error as { data?: { message?: string } }).data?.message ||
-          "Something went wrong"
+        "Something went wrong"
       );
     }
-  }, [createSuccess, updateSuccess, createError, updateError, router]);
+  }, [
+    createSuccess,
+    updateSuccess,
+    createError,
+    updateError,
+    router,
+  ]);
 
   /* ---------------- HANDLERS ---------------- */
 
   const handleSubmit = () => {
-    setCourseData({
+    const data: CourseDataType = {
       ...courseInfo,
       benefits,
       prerequisites,
       courseContentData,
-    });
+    };
+
+    setCourseData(data);
   };
 
   const handleCourseCreate = async () => {
@@ -147,10 +174,8 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
 
   return (
     <div className="w-full flex flex-col lg:flex-row min-h-screen overflow-x-hidden">
-
       {/* LEFT SIDE */}
       <div className="w-full lg:w-[80%] lg:pr-6">
-
         {active === 0 && (
           <CourseInformation
             courseInfo={courseInfo}
@@ -181,7 +206,7 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
           />
         )}
 
-        {active === 3 && (
+        {active === 3 && courseData && (
           <CoursePreview
             active={active}
             setActive={setActive}
@@ -196,7 +221,6 @@ const CreateCourse = ({ isEdit = false, courseId }: Props) => {
       <div className="w-full lg:w-[20%] lg:fixed lg:right-0 lg:top-[100px] lg:h-screen z-10 mt-10 lg:mt-[100px]">
         <CourseOptions active={active} setActive={setActive} />
       </div>
-
     </div>
   );
 };

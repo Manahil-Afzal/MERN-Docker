@@ -8,14 +8,10 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import Link from "next/link";
 
-interface UserType {
+type UserType = {
   role?: string;
-  avatar?:
-    | string
-    | {
-        url?: string;
-      };
-}
+  avatar?: string | { url?: string | null } | null;
+};
 
 type LogOutHandler = () => void | Promise<void>;
 
@@ -39,16 +35,15 @@ const SideBarProfile: FC<Props> = ({
   const imageSrc =
     typeof user?.avatar === "string"
       ? user.avatar
-      : user?.avatar?.url || avatar || avatarDefault;
+      : user?.avatar?.url ?? avatar ?? avatarDefault;
 
   return (
     <div className="w-full flex flex-col">
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${
-          active === 1
-            ? "profile-sidebar-item-active"
-            : "bg-transparent hover:bg-[#ffffff10]"
-        } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
+        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${active === 1
+          ? "profile-sidebar-item-active"
+          : "bg-transparent hover:bg-[#ffffff10]"
+          } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
         onClick={() => setActive(1)}
       >
         <Image
@@ -60,20 +55,18 @@ const SideBarProfile: FC<Props> = ({
         />
 
         <h5
-          className={`pl-3 font-Poppins text-black dark:text-white ${
-            isScrolling ? "hidden 800px:block" : "block"
-          }`}
+          className={`pl-3 font-Poppins text-black dark:text-white ${isScrolling ? "hidden 800px:block" : "block"
+            }`}
         >
           My Account
         </h5>
       </div>
 
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${
-          active === 2
-            ? "profile-sidebar-item-active"
-            : "bg-transparent hover:bg-[#ffffff10]"
-        } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
+        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${active === 2
+          ? "profile-sidebar-item-active"
+          : "bg-transparent hover:bg-[#ffffff10]"
+          } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
         onClick={() => setActive(2)}
       >
         <RiLockPasswordLine
@@ -82,20 +75,18 @@ const SideBarProfile: FC<Props> = ({
         />
 
         <h5
-          className={`pl-3 font-Poppins text-black dark:text-white ${
-            isScrolling ? "hidden 800px:block" : "block"
-          }`}
+          className={`pl-3 font-Poppins text-black dark:text-white ${isScrolling ? "hidden 800px:block" : "block"
+            }`}
         >
           Password
         </h5>
       </div>
 
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${
-          active === 3
-            ? "profile-sidebar-item-active"
-            : "bg-transparent hover:bg-[#ffffff10]"
-        } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
+        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${active === 3
+          ? "profile-sidebar-item-active"
+          : "bg-transparent hover:bg-[#ffffff10]"
+          } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
         onClick={() => setActive(3)}
       >
         <SiCoursera
@@ -104,9 +95,8 @@ const SideBarProfile: FC<Props> = ({
         />
 
         <h5
-          className={`pl-3 font-Poppins text-black dark:text-white ${
-            isScrolling ? "hidden 800px:block" : "block"
-          }`}
+          className={`pl-3 font-Poppins text-black dark:text-white ${isScrolling ? "hidden 800px:block" : "block"
+            }`}
         >
           Courses
         </h5>
@@ -115,11 +105,10 @@ const SideBarProfile: FC<Props> = ({
       {user?.role === "admin" && (
         <Link
           href="/admin"
-          className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${
-            active === 6
-              ? "profile-sidebar-item-active"
-              : "bg-transparent hover:bg-[#ffffff10]"
-          } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
+          className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${active === 6
+            ? "profile-sidebar-item-active"
+            : "bg-transparent hover:bg-[#ffffff10]"
+            } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
         >
           <MdOutlineAdminPanelSettings
             size={20}
@@ -127,9 +116,8 @@ const SideBarProfile: FC<Props> = ({
           />
 
           <h5
-            className={`pl-3 font-Poppins text-black dark:text-white ${
-              isScrolling ? "hidden 800px:block" : "block"
-            }`}
+            className={`pl-3 font-Poppins text-black dark:text-white ${isScrolling ? "hidden 800px:block" : "block"
+              }`}
           >
             Admin
           </h5>
@@ -137,11 +125,10 @@ const SideBarProfile: FC<Props> = ({
       )}
 
       <div
-        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${
-          active === 4
-            ? "profile-sidebar-item-active"
-            : "bg-transparent hover:bg-[#ffffff10]"
-        } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
+        className={`w-full flex items-center px-3 py-4 cursor-pointer transition-all duration-200 ${active === 4
+          ? "profile-sidebar-item-active"
+          : "bg-transparent hover:bg-[#ffffff10]"
+          } ${isScrolling ? "justify-center 800px:justify-start" : ""}`}
         onClick={() => {
           setActive(4);
           void logOutHandler();
@@ -153,9 +140,8 @@ const SideBarProfile: FC<Props> = ({
         />
 
         <h5
-          className={`pl-3 font-Poppins text-black dark:text-white ${
-            isScrolling ? "hidden 800px:block" : "block"
-          }`}
+          className={`pl-3 font-Poppins text-black dark:text-white ${isScrolling ? "hidden 800px:block" : "block"
+            }`}
         >
           Log Out
         </h5>

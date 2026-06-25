@@ -6,9 +6,12 @@ type Props = {
     open: boolean;
     setOpen: (open: boolean) => void;
     activeItem?: unknown;
-    component: React.ComponentType<{ setOpen: (open: boolean) => void; setRoute?: (route: string) => void }>;
-    setRoute?: (route: string) => void;
-}
+    component: React.ComponentType<{
+        setOpen: (open: boolean) => void;
+        setRoute: (route: string) => void;
+    }>;
+    setRoute: (route: string) => void;
+};
 
 const CustomModal: FC<Props> = ({ open, setOpen, setRoute, component: Component }) => {
     const [mounted, setMounted] = useState(false);
@@ -25,7 +28,7 @@ const CustomModal: FC<Props> = ({ open, setOpen, setRoute, component: Component 
         <Modal
             open={open}
             onClose={() => setOpen(false)}
-            disableScrollLock // Recommended for Next.js to prevent layout shift
+            disableScrollLock
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >

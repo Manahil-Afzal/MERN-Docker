@@ -7,7 +7,7 @@ import { IoCheckmarkDoneOutline } from "react-icons/io5";
 type Props = {
   active: number;
   setActive: (active: number) => void;
-  courseData: {
+  courseData?: {
     name?: string;
     demoUrl?: string;
     price?: number | string;
@@ -35,7 +35,7 @@ const CoursePreview: FC<Props> = ({
 
   const discountPercentagePrice = discountPercentage.toFixed(0);
 
-  const prevButton = () =>{
+  const prevButton = () => {
     setActive(active - 1);
   }
 
@@ -136,7 +136,7 @@ const CoursePreview: FC<Props> = ({
             Course Details
           </h1>
           <p className="text-[18px] mt-5 whitespace-pre-line w-full overflow-hidden ">
-             {courseData?.description}
+            {courseData?.description}
           </p>
         </div>
         <br />
@@ -154,7 +154,7 @@ const CoursePreview: FC<Props> = ({
           className="w-[180px] flex items-center justify-center h-10 bg-purple-400 text-center text-white rounded mt-8 cursor-pointer hover:bg-fuchsia-500 transition-colors"
           onClick={() => handleCourseCreate()}
         >
-           {isEdit ? "Update" : "Create"}
+          {isEdit ? "Update" : "Create"}
         </div>
       </div>
     </div>

@@ -15,7 +15,11 @@ import toast from "react-hot-toast";
 interface UserType {
   name?: string;
   email?: string;
-  avatar?: string | { url?: string };
+  role?: string;
+  avatar?: {
+    url?: string | null;
+  } | null;
+  courses?: unknown[];
 }
 
 type Props = {
@@ -29,9 +33,9 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
 
   const [localAvatar, setLocalAvatar] = useState<string | null>(
     avatar ||
-      (typeof user?.avatar === "string"
-        ? user.avatar
-        : user?.avatar?.url || null)
+    (typeof user?.avatar === "string"
+      ? user.avatar
+      : user?.avatar?.url || null)
   );
 
   const [updateAvatar, { isSuccess, error }] =

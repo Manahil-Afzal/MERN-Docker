@@ -6,7 +6,15 @@ import CourseCard from "../Course/CourseCard";
 
 type CourseType = {
   _id: string;
-  [key: string]: unknown;
+  name: string;
+  thumbnail: {
+    url: string;
+  };
+  ratings?: number;
+  purchased?: number;
+  price: number;
+  estimatedPrice?: number;
+  courseData?: Array<unknown>;
 };
 
 const Courses = () => {

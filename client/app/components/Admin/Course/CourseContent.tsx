@@ -1,30 +1,47 @@
+"use client";
+
 import { styles } from "@/app/styles/style";
 import React, { FC, useState } from "react";
-import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlinePlusCircle,
+} from "react-icons/ai";
 import { BsLink45Deg, BsPencil } from "react-icons/bs";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import toast from "react-hot-toast";
+
+/* ---------------- TYPES ---------------- */
 
 interface Link {
   title: string;
   url: string;
 }
 
-interface CourseContentItem {
+/* IMPORTANT:
+   renamed to avoid conflict with parent CourseContentItem */
+interface CourseContentItemUI {
   videoUrl: string;
   title: string;
   description: string;
   videoSection: string;
+  videoLength?: string;
   links: Link[];
+  suggestion: string;
 }
+
+/* ---------------- PROPS ---------------- */
 
 type Props = {
   active: number;
   setActive: (active: number) => void;
-  courseContentData: CourseContentItem[];
-  setCourseContentData: (courseContentData: CourseContentItem[]) => void;
+  courseContentData: CourseContentItemUI[];
+  setCourseContentData: React.Dispatch<
+    React.SetStateAction<CourseContentItemUI[]>
+  >;
   handleSubmit: () => void;
 };
+
+/* ---------------- COMPONENT ---------------- */
 
 const CourseContent: FC<Props> = ({
   courseContentData,
@@ -37,7 +54,9 @@ const CourseContent: FC<Props> = ({
     ? courseContentData
     : [];
 
-  const safeLinks = (item: Partial<CourseContentItem> | null | undefined) =>
+  const safeLinks = (
+    item: Partial<CourseContentItemUI> | null | undefined
+  ): Link[] =>
     Array.isArray(item?.links) && item.links.length > 0
       ? item.links
       : [{ title: "", url: "" }];
@@ -47,186 +66,188 @@ const CourseContent: FC<Props> = ({
       ? safeCourseContentData[safeCourseContentData.length - 1]
       : null;
 
-  const [isCollapsed, setIsCollapsed] = useState(
+  const [isCollapsed, setIsCollapsed] = useState<boolean[]>(
     Array(safeCourseContentData.length).fill(false)
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
-
   const handleCollapseToggle = (index: number) => {
-    const updatedCollapsed = [...isCollapsed];
-    updatedCollapsed[index] = !updatedCollapsed[index];
-    setIsCollapsed(updatedCollapsed);
+    const updated = [...isCollapsed];
+    updated[index] = !updated[index];
+    setIsCollapsed(updated);
   };
 
   const handleRemoveLink = (index: number, linkIndex: number) => {
-    const updatedData = [...safeCourseContentData];
-    updatedData[index].links = safeLinks(updatedData[index]);
-    updatedData[index].links.splice(linkIndex, 1);
-    setCourseContentData(updatedData);
+    const updated = [...safeCourseContentData];
+    updated[index].links = safeLinks(updated[index]);
+    updated[index].links.splice(linkIndex, 1);
+    setCourseContentData(updated);
   };
 
-  const handleAddLink =(index:number) => {
-      const updatedData = [...safeCourseContentData];
-      updatedData[index].links = safeLinks(updatedData[index]);
-      updatedData[index].links.push({title: "", url: ""});
-      setCourseContentData(updatedData);
+  const handleAddLink = (index: number) => {
+    const updated = [...safeCourseContentData];
+    updated[index].links = safeLinks(updated[index]);
+    updated[index].links.push({ title: "", url: "" });
+    setCourseContentData(updated);
   };
 
-  const newContentHandler = (item: CourseContentItem) => {
+  const newContentHandler = (item: CourseContentItemUI) => {
     const itemLinks = safeLinks(item);
-    if(item.title === "" || item.description === "" || item.videoUrl === "" || itemLinks[0].title === "" || itemLinks[0].url === ""){
-        toast.error("Please fill all the fields!");
-    } 
-    else {
-        let newVideoSection = "";
 
-      if(safeCourseContentData.length > 0) {
-        const lastVideoSection = safeCourseContentData[safeCourseContentData.length - 1].videoSection;
+    if (
+      item.title === "" ||
+      item.description === "" ||
+      item.videoUrl === "" ||
+      itemLinks[0].title === "" ||
+      itemLinks[0].url === ""
+    ) {
+      toast.error("Please fill all the fields!");
+      return;
+    }
 
-            if(lastVideoSection){
-                newVideoSection = lastVideoSection;
-            }
-        }
+    const lastSection =
+      safeCourseContentData.length > 0
+        ? safeCourseContentData[safeCourseContentData.length - 1].videoSection
+        : "Untitled Section";
 
-        const newContent ={
-            videoUrl: "",
-            title: "",
-            description: "",
-            videoSection: newVideoSection,
-            links: [{title:"", url: ""}],
-        };
+    const newContent: CourseContentItemUI = {
+      videoUrl: "",
+      title: "",
+      description: "",
+      videoSection: lastSection,
+      videoLength: "",
+      links: [{ title: "", url: "" }],
+      suggestion: "",
+    };
 
     setCourseContentData([...safeCourseContentData, newContent]);
-    };
   };
-     const [activeSection, setActiveSection] = useState(1);
 
-       const addNewSection = () => {
-        const lastItem = getLastContentItem();
-        const lastItemLinks = safeLinks(lastItem);
-        if (!lastItem) {
-            toast.error("Please add content first");
-            return;
-        }
-        if(
-            lastItem.title === "" ||
-            lastItem.description === "" ||
-            lastItem.videoUrl === "" ||
-            lastItemLinks[0].title === "" ||
-            lastItemLinks[0].url === ""
-        ) {
-            toast.error("Please fill all the fields!");
-        } else{
-            setActiveSection(activeSection + 1);
-            const newContent ={
-            videoUrl: "",
-            title: "",
-            description: "",
-            videoSection: `untitled Section ${activeSection}`, 
-            links: [{title:"", url: ""}],
-        };
-            setCourseContentData([...safeCourseContentData, newContent]);
-        }
-       };
+  const [activeSection, setActiveSection] = useState(1);
 
-       const prevButton =() => {
-         setActive(active - 1);
-       };
+  const addNewSection = () => {
+    const lastItem = getLastContentItem();
 
-       const handleOptions =() =>{
-        const lastItem = getLastContentItem();
-        const lastItemLinks = safeLinks(lastItem);
-        if (!lastItem) {
-          toast.error("Please add content first");
-          return;
-        }
-        if(
-          lastItem.title === "" ||
-          lastItem.description === "" ||
-          lastItem.videoUrl === "" ||
-          lastItemLinks[0].title === "" ||
-          lastItemLinks[0].url === ""
-        ) {
-            toast.error("section can't be empty")
-        } else{
-            setActive(active + 1);
-            handleCourseSubmit();
-        }
-       }
+    if (!lastItem) {
+      toast.error("Please add content first");
+      return;
+    }
+
+    const lastLinks = safeLinks(lastItem);
+
+    if (
+      lastItem.title === "" ||
+      lastItem.description === "" ||
+      lastItem.videoUrl === "" ||
+      lastLinks[0].title === "" ||
+      lastLinks[0].url === ""
+    ) {
+      toast.error("Please fill all the fields!");
+      return;
+    }
+
+    setActiveSection((prev) => prev + 1);
+
+    const newContent: CourseContentItemUI = {
+      videoUrl: "",
+      title: "",
+      description: "",
+      videoSection: `Untitled Section ${activeSection}`,
+      videoLength: "",
+      links: [{ title: "", url: "" }],
+      suggestion: "",
+    };
+
+    setCourseContentData([...safeCourseContentData, newContent]);
+  };
+
+  const prevButton = () => {
+    setActive(active - 1);
+  };
+
+  const handleOptions = () => {
+    const lastItem = getLastContentItem();
+
+    if (!lastItem) {
+      toast.error("Please add content first");
+      return;
+    }
+
+    const lastLinks = safeLinks(lastItem);
+
+    if (
+      lastItem.title === "" ||
+      lastItem.description === "" ||
+      lastItem.videoUrl === "" ||
+      lastLinks[0].title === "" ||
+      lastLinks[0].url === ""
+    ) {
+      toast.error("Section can't be empty");
+      return;
+    }
+
+    setActive(active + 1);
+    handleCourseSubmit();
+  };
 
   return (
     <div className="w-[80%] m-auto mt-24 p-3">
-      <form onSubmit={handleSubmit}>
-        {safeCourseContentData.map((item: CourseContentItem, index: number) => {
+      <form onSubmit={(e) => e.preventDefault()}>
+        {safeCourseContentData.map((item, index) => {
           const showSectionInput =
             index === 0 ||
-            item.videoSection !== safeCourseContentData[index - 1].videoSection;
+            item.videoSection !== safeCourseContentData[index - 1]?.videoSection;
 
           return (
             <div
               key={index}
-              className={`w-full bg-[#cdc8c817] p-4 ${
-                showSectionInput ? "mt-10" : "mb-0"
-              }`}
+              className={`w-full bg-[#cdc8c817] p-4 ${showSectionInput ? "mt-10" : "mb-0"
+                }`}
             >
               {showSectionInput && (
                 <>
                   <div className="flex w-full items-center">
                     <input
                       type="text"
-                      className={`text-[20px] ${
-                        item.videoSection === "Untitled Section"
+                      className={`text-[20px] ${item.videoSection === "Untitled Section"
                           ? "w-[170px]"
                           : "w-min"
-                      } font-Poppins cursor-pointer dark:text-white text-black bg-transparent outline-none`}
+                        } font-Poppins cursor-pointer dark:text-white text-black bg-transparent outline-none`}
                       value={item.videoSection}
                       onChange={(e) => {
-                        const updatedData = [...safeCourseContentData];
-                        updatedData[index].videoSection = e.target.value;
-                        setCourseContentData(updatedData);
+                        const updated = [...safeCourseContentData];
+                        updated[index].videoSection = e.target.value;
+                        setCourseContentData(updated);
                       }}
                     />
-                    <BsPencil className="cursor-pointer dark:text-white text-black" />
+                    <BsPencil className="cursor-pointer" />
                   </div>
                   <br />
                 </>
               )}
 
-              <div className="flex w-full items-center justify-between my-0">
-                {isCollapsed[index] ? (
-                  item.title ? (
-                    <p className="font-Poppins dark:text-white text-black">
+              <div className="flex justify-between items-center">
+                <div>
+                  {isCollapsed[index] && item.title ? (
+                    <p>
                       {index + 1}. {item.title}
                     </p>
-                  ) : null
-                ) : (
-                  <div></div>
-                )}
+                  ) : null}
+                </div>
 
                 <div className="flex items-center">
                   <AiOutlineDelete
-                    className={`dark:text-white text-[20px] mr-2 text-black ${
-                      index > 0 ? "cursor-pointer" : "cursor-no-drop"
-                    }`}
+                    className="cursor-pointer"
                     onClick={() => {
                       if (index > 0) {
-                        const updatedData = [...safeCourseContentData];
-                        updatedData.splice(index, 1);
-                        setCourseContentData(updatedData);
+                        const updated = [...safeCourseContentData];
+                        updated.splice(index, 1);
+                        setCourseContentData(updated);
                       }
                     }}
                   />
+
                   <MdOutlineKeyboardArrowDown
-                    fontSize="large"
-                    className="dark:text-white text-black cursor-pointer"
-                    style={{
-                      transform: isCollapsed[index]
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                    }}
+                    className="cursor-pointer"
                     onClick={() => handleCollapseToggle(index)}
                   />
                 </div>
@@ -234,142 +255,90 @@ const CourseContent: FC<Props> = ({
 
               {!isCollapsed[index] && (
                 <>
-                  <div className="my-3">
-                    <label className={styles.label}>Video Title</label>
-                    <input
-                      type="text"
-                      placeholder="Project Plan..."
-                      className={styles.input}
-                      value={item.title}
-                      onChange={(e) => {
-                        const updatedData = [...safeCourseContentData];
-                        updatedData[index].title = e.target.value;
-                        setCourseContentData(updatedData);
-                      }}
-                    />
-                  </div>
+                  <input
+                    className={styles.input}
+                    placeholder="Video Title"
+                    value={item.title}
+                    onChange={(e) => {
+                      const updated = [...safeCourseContentData];
+                      updated[index].title = e.target.value;
+                      setCourseContentData(updated);
+                    }}
+                  />
 
-                  <div className="mb-3">
-                    <label className={styles.label}>Video Url</label>
-                    <input
-                      type="text"
-                      placeholder="Enter video URL..."
-                      className={styles.input}
-                      value={item.videoUrl}
-                      onChange={(e) => {
-                        const updatedData = [...safeCourseContentData];
-                        updatedData[index].videoUrl = e.target.value;
-                        setCourseContentData(updatedData);
-                      }}
-                    />
-                  </div>
+                  <input
+                    className={styles.input}
+                    placeholder="Video URL"
+                    value={item.videoUrl}
+                    onChange={(e) => {
+                      const updated = [...safeCourseContentData];
+                      updated[index].videoUrl = e.target.value;
+                      setCourseContentData(updated);
+                    }}
+                  />
 
-                  <div className="mb-3">
-                    <label className={styles.label}>Video Description</label>
-                    <textarea
-                      rows={8}
-                      cols={30}
-                      placeholder="Enter video description..."
-                      className={`${styles.input} h-min! py-2`}
-                      value={item.description}
-                      onChange={(e) => {
-                        const updatedData = [...safeCourseContentData];
-                        updatedData[index].description = e.target.value;
-                        setCourseContentData(updatedData);
-                      }}
-                    />
-                    <br />
-                  </div>
+                  <textarea
+                    className={styles.input}
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) => {
+                      const updated = [...safeCourseContentData];
+                      updated[index].description = e.target.value;
+                      setCourseContentData(updated);
+                    }}
+                  />
 
-                  {safeLinks(item).map((link: Link, linkIndex: number) => (
-                    <div className="mb-3 block" key={linkIndex}>
-                      <div className="w-full flex items-center justify-between">
-                        <label className={styles.label}>Link {linkIndex + 1}</label>
-                        <AiOutlineDelete
-                          className={`${
-                            linkIndex === 0 ? "cursor-no-drop" : "cursor-pointer"
-                          } text-black dark:text-white text-[20px]`}
-                          onClick={() =>
-                            linkIndex === 0 ? null : handleRemoveLink(index, linkIndex)
-                          }
-                        />
-                      </div>
+                  {safeLinks(item).map((link, linkIndex) => (
+                    <div key={linkIndex}>
                       <input
-                        type="text"
-                        placeholder="Source Code... (Link Title)"
                         className={styles.input}
                         value={link.title}
+                        placeholder="Link Title"
                         onChange={(e) => {
-                          const updatedData = [...safeCourseContentData];
-                          updatedData[index].links = safeLinks(updatedData[index]);
-                          updatedData[index].links[linkIndex].title = e.target.value;
-                          setCourseContentData(updatedData);
+                          const updated = [...safeCourseContentData];
+                          updated[index].links[linkIndex].title =
+                            e.target.value;
+                          setCourseContentData(updated);
                         }}
                       />
+
                       <input
-                        type="url"
-                        placeholder="Source Code... (Link URL)"
-                        className={`${styles.input} mt-6`}
+                        className={styles.input}
                         value={link.url}
+                        placeholder="Link URL"
                         onChange={(e) => {
-                          const updatedData = [...safeCourseContentData];
-                          updatedData[index].links = safeLinks(updatedData[index]);
-                          updatedData[index].links[linkIndex].url = e.target.value;
-                          setCourseContentData(updatedData);
+                          const updated = [...safeCourseContentData];
+                          updated[index].links[linkIndex].url = e.target.value;
+                          setCourseContentData(updated);
                         }}
                       />
                     </div>
                   ))}
-                  <br />
-                  {/* add links button */}
-                  <div className="inline-block mb-4">
-                      <p className="flex items-center text-[18px] dark:text-white text-black cursor-pointer"
-                        onClick={() => handleAddLink(index)}
-                      >
-                        <BsLink45Deg className="mr-2" /> Add Link
-                      </p>
-                  </div>
+
+                  <p onClick={() => handleAddLink(index)}>
+                    <BsLink45Deg /> Add Link
+                  </p>
                 </>
               )}
-              <br />
-              {/* add new content */}
+
               {index === safeCourseContentData.length - 1 && (
-                <div>
-                    <p className="flex items-center text-[18px] dark:text-white text-black cursor-pointer"
-                     onClick={() => newContentHandler(item)}
-                    >
-                  <AiOutlinePlusCircle className="mr-2" /> 
-                    Add new Content
-                    </p>
-                </div>
+                <p onClick={() => newContentHandler(item)}>
+                  <AiOutlinePlusCircle /> Add new Content
+                </p>
               )}
             </div>
           );
-        })} 
-        <br />
+        })}
 
-        <div className="flex items-center text-[20px] dark:text-white text-black cursor-pointer"
-           onClick={() => addNewSection()}
-        >
-           <AiOutlinePlusCircle className="mr-2" /> Add new Section
-        </div>
-      </form>      
-      <br />        
-       <div className='w-full flex items-center justify-between gap-4'>
-            <div className='w-[180px] flex items-center justify-center h-10 bg-purple-400 text-center text-white rounded mt-8 cursor-pointer hover:bg-fuchsia-500 transition-colors'
-             onClick={() => prevButton()}
-             >
-                  Prev              
-            </div>
-            <div className='w-[180px] flex items-center justify-center h-10 bg-purple-400 text-center text-white rounded mt-8 cursor-pointer hover:bg-fuchsia-500 transition-colors'
-                onClick={() => handleOptions()}
-                >
-                    Next
-            </div>
-        </div>
-        <br />
-        <br />
-        <br />
+        <p onClick={addNewSection}>
+          <AiOutlinePlusCircle /> Add Section
+        </p>
+      </form>
+
+      <div className="flex justify-between mt-10">
+        <button onClick={prevButton}>Prev</button>
+        <button onClick={handleOptions}>Next</button>
+      </div>
     </div>
   );
 };

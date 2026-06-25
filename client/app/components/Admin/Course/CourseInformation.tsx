@@ -1,12 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { styles } from "@/app/styles/style";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
-import React, { FC, useEffect, useState, Dispatch, SetStateAction } from "react";
-
-/* ---------------- TYPES ---------------- */
-
-import { CourseInfo } from "@/types/course";
+import React, { FC, useState, Dispatch, SetStateAction } from "react";
+import { CourseInfo } from "./CreateCourse";
 
 interface Category {
   _id: string;
@@ -20,8 +18,6 @@ type Props = {
   setActive: (active: number) => void;
 };
 
-/* ---------------- COMPONENT ---------------- */
-
 const CourseInformation: FC<Props> = ({
   courseInfo,
   setCourseInfo,
@@ -29,27 +25,16 @@ const CourseInformation: FC<Props> = ({
   setActive,
 }) => {
   const [dragging, setDragging] = useState(false);
+
   const { data } = useGetHeroDataQuery("Categories", {});
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  /* ---------------- LOAD CATEGORIES ---------------- */
-
-  useEffect(() => {
-    if (data) {
-      setCategories(data.layout.categories);
-    }
-  }, [data]);
+  const categories: Category[] = data?.layout?.categories ?? [];
 
   const hasCategoryOptions = categories.length > 0;
-
-  /* ---------------- FORM SUBMIT ---------------- */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setActive(active + 1);
   };
-
-  /* ---------------- FILE UPLOAD ---------------- */
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,17 +44,17 @@ const CourseInformation: FC<Props> = ({
 
     reader.onload = () => {
       if (typeof reader.result === "string") {
+        const image = reader.result as string;
+
         setCourseInfo((prev) => ({
           ...prev,
-          thumbnail: reader.result,
+          thumbnail: image,
         }));
       }
     };
 
     reader.readAsDataURL(file);
   };
-
-  /* ---------------- DRAG EVENTS ---------------- */
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -92,9 +77,11 @@ const CourseInformation: FC<Props> = ({
 
     reader.onload = () => {
       if (typeof reader.result === "string") {
+        const image = reader.result as string;
+
         setCourseInfo((prev) => ({
           ...prev,
-          thumbnail: reader.result,
+          thumbnail: image,
         }));
       }
     };
@@ -102,26 +89,28 @@ const CourseInformation: FC<Props> = ({
     reader.readAsDataURL(file);
   };
 
-  /* ---------------- UI ---------------- */
-
   return (
     <div className="w-[80%] m-auto mt-40">
-      <form onSubmit={handleSubmit} className={styles.label}>
-
+      <form onSubmit={handleSubmit}>
         {/* COURSE NAME */}
-        <label>Course Name</label>
-        <input
-          type="text"
-          required
-          value={courseInfo.name}
-          onChange={(e) =>
-            setCourseInfo({ ...courseInfo, name: e.target.value })
-          }
-          className={styles.input}
-        />
+        <div className="mb-5">
+          <label className={styles.label}>Course Name</label>
+          <input
+            type="text"
+            required
+            value={courseInfo.name}
+            onChange={(e) =>
+              setCourseInfo({
+                ...courseInfo,
+                name: e.target.value,
+              })
+            }
+            className={styles.input}
+          />
+        </div>
 
         {/* DESCRIPTION */}
-        <div className="mb-5 mt-8">
+        <div className="mb-5">
           <label className={styles.label}>Course Description</label>
           <textarea
             rows={8}
@@ -133,7 +122,7 @@ const CourseInformation: FC<Props> = ({
                 description: e.target.value,
               })
             }
-            className={`${styles.input} h-min! py-2!`}
+            className={`${styles.input} h-min py-2`}
           />
         </div>
 
@@ -146,7 +135,10 @@ const CourseInformation: FC<Props> = ({
               required
               value={courseInfo.price}
               onChange={(e) =>
-                setCourseInfo({ ...courseInfo, price: e.target.value })
+                setCourseInfo({
+                  ...courseInfo,
+                  price: e.target.value,
+                })
               }
               className={styles.input}
             />
@@ -169,21 +161,24 @@ const CourseInformation: FC<Props> = ({
         </div>
 
         {/* TAGS + CATEGORY */}
-        <div className="w-full flex justify-between mt-5">
-          <div className="w-[45%]">
+        <div className="w-full flex flex-wrap justify-between mt-5 gap-4">
+          <div className="w-full md:w-[45%]">
             <label className={styles.label}>Tags</label>
             <input
               type="text"
               required
               value={courseInfo.tags}
               onChange={(e) =>
-                setCourseInfo({ ...courseInfo, tags: e.target.value })
+                setCourseInfo({
+                  ...courseInfo,
+                  tags: e.target.value,
+                })
               }
               className={styles.input}
             />
           </div>
 
-          <div className="w-[50%]">
+          <div className="w-full md:w-[50%]">
             <label className={styles.label}>Category</label>
 
             {hasCategoryOptions ? (
@@ -199,6 +194,7 @@ const CourseInformation: FC<Props> = ({
                 className={styles.input}
               >
                 <option value="">Select Category</option>
+
                 {categories.map((item) => (
                   <option key={item._id} value={item.title}>
                     {item.title}
@@ -223,22 +219,25 @@ const CourseInformation: FC<Props> = ({
           </div>
         </div>
 
-        {/* LEVEL + DEMO */}
-        <div className="w-full flex justify-between mt-5">
-          <div className="w-[45%]">
+        {/* LEVEL + DEMO URL */}
+        <div className="w-full flex flex-wrap justify-between mt-5 gap-4">
+          <div className="w-full md:w-[45%]">
             <label className={styles.label}>Level</label>
             <input
               type="text"
               required
               value={courseInfo.level}
               onChange={(e) =>
-                setCourseInfo({ ...courseInfo, level: e.target.value })
+                setCourseInfo({
+                  ...courseInfo,
+                  level: e.target.value,
+                })
               }
               className={styles.input}
             />
           </div>
 
-          <div className="w-[50%]">
+          <div className="w-full md:w-[50%]">
             <label className={styles.label}>Demo URL</label>
             <input
               type="text"
@@ -255,41 +254,45 @@ const CourseInformation: FC<Props> = ({
           </div>
         </div>
 
-        {/* UPLOAD */}
+        {/* FILE INPUT */}
         <input
           type="file"
-          accept="image/*"
           id="file"
+          accept="image/*"
           className="hidden"
           onChange={handleFileChange}
         />
 
-        <label
-          htmlFor="file"
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`w-full min-h-[10vh] border flex items-center justify-center p-6 ${
-            dragging ? "bg-purple-300" : "bg-transparent"
-          }`}
-        >
-          {courseInfo.thumbnail ? (
-            <img
-              src={courseInfo.thumbnail}
-              alt="thumbnail"
-              className="max-h-[200px] w-full object-cover"
-            />
-          ) : (
-            <span>Drag & Drop or Click to Upload Thumbnail</span>
-          )}
-        </label>
+        {/* THUMBNAIL */}
+        <div className="mt-5">
+          <label
+            htmlFor="file"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`w-full min-h-[200px] border-2 border-dashed rounded flex items-center justify-center cursor-pointer p-4 ${dragging ? "bg-purple-200" : ""
+              }`}
+          >
+            {courseInfo.thumbnail ? (
+              <img
+                src={courseInfo.thumbnail}
+                alt="Course Thumbnail"
+                className="w-full max-h-[300px] object-cover rounded"
+              />
+            ) : (
+              <span className="text-center">
+                Drag & Drop Thumbnail Here or Click to Upload
+              </span>
+            )}
+          </label>
+        </div>
 
         {/* NEXT BUTTON */}
-        <div className="flex justify-end mt-5">
+        <div className="w-full flex justify-end mt-8">
           <input
             type="submit"
             value="Next"
-            className="w-[140px] h-10 bg-purple-400 text-white rounded cursor-pointer"
+            className="w-[140px] h-[40px] bg-[#37a39a] text-white rounded cursor-pointer"
           />
         </div>
       </form>

@@ -7,54 +7,55 @@ import { Box, Button, Modal } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Loader from "../../Loader/Loader";
 import { format } from "timeago.js";
-import {
-  useGetAllUsersQuery,
-} from "@/redux/features/user/userApi";
+import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
 
+/* ---------------- TYPES ---------------- */
 
 type Props = {
   isTeam?: boolean;
 };
 
+type User = {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  courses?: unknown[];
+  createdAt: string | Date;
+};
+
+type Row = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  courses: number;
+  created_at: string;
+};
+
+/* ---------------- COMPONENT ---------------- */
+
 const AllUsers: FC<Props> = () => {
   const { theme } = useTheme();
 
   const [active, setActive] = useState(false);
-  type UserRow = {
-    _id: string;
-    name: string;
-    email: string;
-    role: string;
-    courses?: unknown[];
-    createdAt: string | Date;
-  };
-
-  const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
-
+  const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
 
   const { isLoading, data } = useGetAllUsersQuery({});
 
-
-
-
-  type Row = {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    courses: number;
-    created_at: string;
-  };
+  /* ---------------- ROWS ---------------- */
 
   const rows: Row[] =
-    data?.users?.map((item) => ({
+    ((data?.users as User[] | undefined) ?? []).map((item) => ({
       id: item._id,
       name: item.name,
       email: item.email,
       role: item.role,
       courses: item.courses?.length ?? 0,
       created_at: format(item.createdAt),
-    })) ?? [];
+    }));
+
+  /* ---------------- COLUMNS ---------------- */
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
@@ -63,7 +64,6 @@ const AllUsers: FC<Props> = () => {
     { field: "role", headerName: "Role", flex: 0.5 },
     { field: "courses", headerName: "Courses", flex: 0.5 },
     { field: "created_at", headerName: "Joined", flex: 0.5 },
-
 
     {
       field: "delete",
@@ -85,8 +85,9 @@ const AllUsers: FC<Props> = () => {
         </Button>
       ),
     },
-
   ];
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="mt-[120px]">
@@ -94,7 +95,6 @@ const AllUsers: FC<Props> = () => {
         <Loader />
       ) : (
         <Box sx={{ m: "20px" }}>
-          {/* 🔥 RESPONSIVE WRAPPER */}
           <Box sx={{ width: "100%", overflowX: "auto" }}>
             <Box sx={{ minWidth: { xs: "900px", md: "100%" } }}>
               <Box
@@ -107,7 +107,6 @@ const AllUsers: FC<Props> = () => {
                     outline: "none",
                   },
 
-                  /* ROW COLORS SAME */
                   "& .MuiDataGrid-row": {
                     color: theme === "dark" ? "#fff" : "#000",
                     borderBottom:
@@ -132,10 +131,10 @@ const AllUsers: FC<Props> = () => {
                   },
 
                   "& .MuiDataGrid-virtualScroller": {
-                    backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                    backgroundColor:
+                      theme === "dark" ? "#1F2A40" : "#F2F0F0",
                   },
 
-                  /* remove hover change */
                   "& .MuiDataGrid-row:hover": {
                     backgroundColor: "transparent !important",
                   },
@@ -155,7 +154,7 @@ const AllUsers: FC<Props> = () => {
             </Box>
           </Box>
 
-          {/* MODALS unchanged */}
+          {/* MODALS */}
           <Modal open={active} onClose={() => setActive(false)}>
             <Box />
           </Modal>

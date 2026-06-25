@@ -13,7 +13,9 @@ type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   user?: {
-    avatar?: { url: string } | null;
+    avatar?: {
+      url?: string | null;
+    } | null;
   } | null;
 
   setRoute?: (route: string) => void;
@@ -34,17 +36,15 @@ const MobileSidebar: FC<Props> = ({
     <>
       {open && (
         <div
-          className={`fixed inset-0 z-40 md:hidden ${
-            isDark ? "bg-gray-900/50" : "bg-black/30"
-          }`}
+          className={`fixed inset-0 z-40 md:hidden ${isDark ? "bg-gray-900/50" : "bg-black/30"
+            }`}
           onClick={() => setOpen(false)}
         />
       )}
 
       <div
-        className={`fixed top-0 left-0 h-screen w-64 z-50 flex flex-col md:hidden shadow-lg ${
-          isDark ? "bg-gray-800" : "bg-white"
-        } ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-screen w-64 z-50 flex flex-col md:hidden shadow-lg ${isDark ? "bg-gray-800" : "bg-white"
+          } ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between p-4 border-b">
           <Link href="/" onClick={() => setOpen(false)}>
@@ -66,7 +66,7 @@ const MobileSidebar: FC<Props> = ({
           {user ? (
             <Link href="/profile" onClick={() => setOpen(false)}>
               <Image
-                src={user.avatar ? user.avatar.url : avatar}
+                src={user?.avatar?.url || avatar}
                 alt="profile"
                 width={42}
                 height={42}

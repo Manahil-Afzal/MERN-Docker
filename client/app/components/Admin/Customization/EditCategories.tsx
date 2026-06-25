@@ -53,7 +53,7 @@ const EditCategories = () => {
 
     if (error && "data" in error) {
       const errorData = error as { data?: { message?: string } };
-      toast.error(errorData?.data?.message);
+      toast.error(errorData?.data?.message || "Something went wrong");
     }
   }, [data, layoutSuccess, error, refetch]);
 
@@ -154,16 +154,15 @@ const EditCategories = () => {
           {/* SAVE BUTTON */}
           <div
             className={`${styles.button} w-[100px]! min-h-10! h-10! dark:text-white text-black bg-[#cccccc34]
-              ${
-                areCategoriesUnchanged(data?.layout?.categories ?? [], categories) ||
+              ${areCategoriesUnchanged(data?.layout?.categories ?? [], categories) ||
                 isAnyCategoryTitleEmpty(categories)
-                  ? "cursor-not-allowed!"
-                  : "cursor-pointer! bg-purple-400!"
+                ? "cursor-not-allowed!"
+                : "cursor-pointer! bg-purple-400!"
               }
               rounded! fixed bottom-6 right-6 md:bottom-12 md:right-12`}
             onClick={
               areCategoriesUnchanged(data?.layout?.categories ?? [], categories) ||
-              isAnyCategoryTitleEmpty(categories)
+                isAnyCategoryTitleEmpty(categories)
                 ? () => null
                 : editCategoriesHandler
             }
