@@ -5,7 +5,7 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl:
-      process.env.NEXT_PUBLIC_SERVER_URI || "https://zylo-learning.vercel.app/api/v1",
+      process.env.NEXT_PUBLIC_SERVER_URI || "http://13.53.127.99:8000/api/v1",
   }),
 
   endpoints: (builder) => ({

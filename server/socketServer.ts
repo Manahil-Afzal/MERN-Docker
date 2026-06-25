@@ -4,7 +4,7 @@ import { Server } from "http";
 export const initSocketServer = (server: Server) => {
     const io = new SocketIOServer(server, {
         cors: {
-            origin: process.env.ORIGIN || "http://localhost:3000",
+            origin: process.env.ORIGIN,
             credentials: true,
         },
     });

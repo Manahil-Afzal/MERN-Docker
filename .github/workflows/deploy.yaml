@@ -93,3 +93,28 @@ jobs:
 
       - name: Push Server Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/zylo-server
+
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [docker]
+
+    steps:
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/zylo-client:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/zylo-server:latest
+
+            docker stop zylo-client || true
+            docker rm zylo-client || true
+            docker stop zylo-server || true
+            docker rm zylo-server || true
+
+            docker run -d -p 3000:3000 --name zylo-client ${{ secrets.DOCKER_USERNAME }}/zylo-client:latest
+            docker run -d -p 5000:5000 --name zylo-server ${{ secrets.DOCKER_USERNAME }}/zylo-server:latest
