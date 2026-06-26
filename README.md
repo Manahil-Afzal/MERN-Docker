@@ -389,42 +389,6 @@ http://13.53.127.99:8000
 OAuth must match exact callback URLs
 Domain is optional but recommended for production
 
-## Key Features
-
-### For Students
-- Browse and filter all available courses.
-- Preview course details, benefits, prerequisites, and demo videos.
-- Purchase courses securely via Stripe checkout.
-- Access purchased course content with DRM-protected video playback.
-- Ask questions on specific course sections and view teacher replies.
-- Leave ratings and reviews on completed or in-progress courses.
-- Receive real-time notifications for replies and updates.
-- Manage profile and change password.
-
-### For Admins
-- Secure admin-only dashboard with analytics widgets.
-- Create, edit, and delete courses with thumbnails and video content.
-- Upload and manage course media via Cloudinary and VdoCipher.
-- View user, course, and order analytics with charts.
-- Manage platform layout: hero banner, FAQ, and categories.
-- View all users, orders, and invoices.
-- Manage team members and role-based access.
-- Send and manage notifications.
-
-## Core Features
-
-- **Course Management**: Full CRUD for courses including sections, videos, links, benefits, and prerequisites.
-- **DRM Video Protection**: VdoCipher OTP-based secure video playback with time-limited tokens.
-- **Q&A and Reviews**: Nested question-reply threads and star ratings with comments per course.
-- **Purchase Verification**: Access to course content is gated by checking the user's enrolled courses array and order records.
-- **Caching Layer**: Redis caches frequently accessed course data for improved performance.
-- **Real-Time Notifications**: Socket.io pushes live updates for new replies, reviews, and system notifications.
-- **Email Notifications**: Automated emails for account activation, order confirmations, and question replies using EJS templates.
-- **Analytics**: Aggregated dashboards for user growth, course enrollments, and revenue tracking.
-- **Rate Limiting**: API endpoints are protected with express-rate-limit to prevent abuse.
-- **Responsive UI**: Tailwind CSS-based design with dark mode support via next-themes.
-- **State Management**: Redux Toolkit handles global state for auth, courses, orders, and analytics.
-- **TypeScript**: Full-stack type safety across client and server.
 
 ## API Endpoints
 
@@ -449,38 +413,6 @@ Domain is optional but recommended for production
 | `GET /api/v1/layout` | Get platform layout |
 | `PUT /api/v1/layout` | Update layout (admin) |
 
-## Setup
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd Zylo
-   ```
-
-2. Install server dependencies:
-   ```bash
-   cd server
-   npm install
-   ```
-
-3. Install client dependencies:
-   ```bash
-   cd ../client
-   npm install
-   ```
-
-4. Create environment files (see Environment Variables below).
-
-5. Run the development servers:
-   ```bash
-   # Terminal 1 - Backend
-   cd server
-   npm run dev
-
-   # Terminal 2 - Frontend
-   cd client
-   npm run dev
-   ```
 
 ## Environment Variables
 
