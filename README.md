@@ -233,59 +233,154 @@ Backend --> Email[Nodemailer]
 
 ---
 
-⚙️ EC2 Container Management
-▶️ Check running containers
+## 🐳 Docker Runtime on EC2
+
+### Docker Containers
+
+```mermaid
+graph TD
+
+EC2[AWS EC2 Ubuntu Server]
+
+EC2 --> Docker[Docker Engine]
+
+Docker --> Client[zylo-client Container :3000]
+Docker --> Server[zylo-server Container :8000]
+
+Client --> PublicIP[Frontend http://13.53.127.99:3000]
+Server --> PublicAPI[Backend http://13.53.127.99:8000/api/v1]
+```
+
+### Request Flow
+
+```mermaid
+graph LR
+
+User[User Browser]
+
+User --> Frontend[Next.js Frontend]
+
+Frontend --> Backend[Express API]
+
+Backend --> MongoDB[(MongoDB Atlas)]
+
+Backend --> Redis[(Upstash Redis)]
+
+Backend --> Stripe[Stripe]
+
+Backend --> Cloudinary[Cloudinary]
+
+Backend --> VdoCipher[VdoCipher]
+
+Backend --> Nodemailer[Nodemailer]
+```
+
+## ⚙️ EC2 Container Management
+
+### Check Running Containers
+
+```bash
 docker ps
-▶️ Start backend
+```
+
+### Start Backend
+
+```bash
 docker run -d \
   --name zylo-server \
   -p 8000:8000 \
   --env-file .env \
   mahiig/zylo-server:latest
-▶️ Start frontend
+```
+
+### Start Frontend
+
+```bash
 docker run -d \
   --name zylo-client \
   -p 3000:3000 \
   --env-file .env \
   mahiig/zylo-client:latest
-🔄 Restart services
+```
+
+### Restart Containers
+
+```bash
 docker restart zylo-client
 docker restart zylo-server
-🔐 EC2 Environment Configuration
+```
 
-On EC2, backend requires proper .env setup:
+---
 
+## 🔐 EC2 Environment Configuration
+
+```env
 PORT=8000
 NODE_ENV=production
 ORIGIN=http://13.53.127.99:3000
 CLIENT_URL=http://13.53.127.99:3000
-⚠️ Important Notes
-ORIGIN and CLIENT_URL MUST match frontend URL
-Backend must be running before frontend API calls
-Redis must be configured properly or server will crash
-🔐 OAuth on EC2 (Critical)
-Google / GitHub Redirect URLs
+```
+
+### Important Notes
+
+- ORIGIN and CLIENT_URL must match the frontend URL.
+- Backend must be running before the frontend can make API requests.
+- Redis must be configured correctly before starting the server.
+
+---
+
+## 🔐 OAuth Configuration
+
+### Callback URLs
+
+```text
 http://13.53.127.99:3000/api/auth/callback/google
 http://13.53.127.99:3000/api/auth/callback/github
-NextAuth configuration
+```
+
+### NextAuth
+
+```env
 NEXTAUTH_URL=http://13.53.127.99:3000
 NEXTAUTH_SECRET=your-secret
-⚠️ OAuth Limitation (Important)
-Google may reject raw IP domains in some cases
-If OAuth fails:
-Use Cloudflare Tunnel OR
-Use purchased domain
-🌍 Optional Domain Layer (Production Upgrade)
-DNS Setup
-A Record → EC2 Public IP
+```
 
-Example:
+---
 
-yourdomain.com → 13.53.127.99
-🔁 Final Deployment Flow
-📌 Summary
-EC2 hosts both client + server
-Docker runs both services
+## 🌐 Production Domain (Optional)
+
+```
+yourdomain.com
+        │
+        ▼
+AWS EC2 Public IP
+```
+
+---
+
+## 📌 Deployment Summary
+
+- EC2 hosts both frontend and backend.
+- Docker runs both services as separate containers.
+- MongoDB Atlas stores application data.
+- Upstash Redis handles caching.
+- Cloudinary stores images.
+- VdoCipher secures video streaming.
+- Stripe processes payments.
+
+### Public URLs
+
+Frontend
+
+```
+http://13.53.127.99:3000
+```
+
+Backend
+
+```
+http://13.53.127.99:8000/api/v1
+```
 
 Public access via:
 
