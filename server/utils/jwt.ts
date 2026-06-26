@@ -27,6 +27,7 @@ export const accessTokenOptions: ITokenOptions = {
   maxAge: accessTokenExpire * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: "lax",
+  secure: false,
 };
 
 export const refreshTokenOptions: ITokenOptions = {
@@ -36,6 +37,7 @@ export const refreshTokenOptions: ITokenOptions = {
   maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: "lax",
+  secure: false,
 };
 
 export const sendToken = (
@@ -72,8 +74,8 @@ export const sendToken = (
     ),
     maxAge: accessTokenExpire * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
+    sameSite: "lax",
+    secure: false,
   };
 
   const refreshTokenOptions: ITokenOptions = {
@@ -82,12 +84,12 @@ export const sendToken = (
     ),
     maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
+    sameSite: "lax",
+    secure: false,
   };
 
   // only set secure to true in production
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && process.env.USE_HTTPS === "true") {
     accessTokenOptions.secure = true;
     refreshTokenOptions.secure = true;
   }

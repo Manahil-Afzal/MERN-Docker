@@ -6,6 +6,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl:
       process.env.NEXT_PUBLIC_SERVER_URI || "http://13.53.127.99:8000/api/v1",
+    credentials: "include",
   }),
 
   endpoints: (builder) => ({
@@ -15,7 +16,6 @@ export const apiSlice = createApi({
       query: () => ({
         url: "user/refresh",
         method: "GET",
-        credentials: "include" as const,
       }),
     }),
 
@@ -23,7 +23,6 @@ export const apiSlice = createApi({
       query: () => ({
         url: "user/me",
         method: "GET",
-        credentials: "include" as const,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {

@@ -24,8 +24,9 @@ app.use(cookieParser());
 // CORS
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL || "https://zylo-app-plum.vercel.app",
+    origin: [
+      "http://13.53.127.99:3000",
+    ],
     credentials: true,
   })
 );
