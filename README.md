@@ -186,6 +186,114 @@ sequenceDiagram
     API-->>UI: Layout updated
 ```
 
+## 🚀 EC2 Deployment Architecture (AWS)
+
+This project is deployed on an AWS EC2 Ubuntu instance where both frontend and backend are containerized using Docker.
+
+### 🖥️ EC2 Overview
+
+- EC2 acts as the **single hosting server**
+- It runs:
+  - Next.js frontend container (`zylo-client`)
+  - Express backend container (`zylo-server`)
+- Both services communicate internally over Docker network
+- External users access via public EC2 IP
+
+---
+
+## 🐳 Docker Runtime on EC2
+
+```mermaid
+graph TD
+
+EC2[AWS EC2 Ubuntu Server]
+
+EC2 --> Docker[Docker Engine]
+
+Docker --> Client[zylo-client container :3000]
+Docker --> Server[zylo-server container :8000]
+
+Client --> PublicIP[http://13.53.127.99:3000]
+Server --> PublicAPI[http://13.53.127.99:8000/api/v1]
+
+---
+
+graph LR
+
+UserBrowser[User Browser]
+
+UserBrowser --> Frontend[EC2 Frontend :3000]
+Frontend --> Backend[EC2 Backend :8000]
+
+Backend --> DB[(MongoDB Atlas)]
+Backend --> Cache[(Redis / Upstash)]
+Backend --> Payments[Stripe]
+Backend --> Media[Cloudinary / VdoCipher]
+Backend --> Email[Nodemailer]
+
+---
+
+⚙️ EC2 Container Management
+▶️ Check running containers
+docker ps
+▶️ Start backend
+docker run -d \
+  --name zylo-server \
+  -p 8000:8000 \
+  --env-file .env \
+  mahiig/zylo-server:latest
+▶️ Start frontend
+docker run -d \
+  --name zylo-client \
+  -p 3000:3000 \
+  --env-file .env \
+  mahiig/zylo-client:latest
+🔄 Restart services
+docker restart zylo-client
+docker restart zylo-server
+🔐 EC2 Environment Configuration
+
+On EC2, backend requires proper .env setup:
+
+PORT=8000
+NODE_ENV=production
+ORIGIN=http://13.53.127.99:3000
+CLIENT_URL=http://13.53.127.99:3000
+⚠️ Important Notes
+ORIGIN and CLIENT_URL MUST match frontend URL
+Backend must be running before frontend API calls
+Redis must be configured properly or server will crash
+🔐 OAuth on EC2 (Critical)
+Google / GitHub Redirect URLs
+http://13.53.127.99:3000/api/auth/callback/google
+http://13.53.127.99:3000/api/auth/callback/github
+NextAuth configuration
+NEXTAUTH_URL=http://13.53.127.99:3000
+NEXTAUTH_SECRET=your-secret
+⚠️ OAuth Limitation (Important)
+Google may reject raw IP domains in some cases
+If OAuth fails:
+Use Cloudflare Tunnel OR
+Use purchased domain
+🌍 Optional Domain Layer (Production Upgrade)
+DNS Setup
+A Record → EC2 Public IP
+
+Example:
+
+yourdomain.com → 13.53.127.99
+🔁 Final Deployment Flow
+📌 Summary
+EC2 hosts both client + server
+Docker runs both services
+
+Public access via:
+
+http://13.53.127.99:3000
+http://13.53.127.99:8000
+OAuth must match exact callback URLs
+Domain is optional but recommended for production
+
 ## Key Features
 
 ### For Students
