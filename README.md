@@ -230,6 +230,8 @@ Server --> PublicAPI[Backend http://13.60.70.223:3000:8000/api/v1]
 
 ### Request Flow
 
+```mermaid
+
 User[User Browser]
 
 User --> Frontend[Next.js Frontend]
@@ -308,14 +310,14 @@ CLIENT_URL=http://13.53.127.99:3000
 ### Callback URLs
 
 ```text
-http://13.53.127.99:3000/api/auth/callback/google
-http://13.53.127.99:3000/api/auth/callback/github
+http://13.60.70.223:3000/api/auth/callback/google
+http://13.60.70.223:8000/api/auth/callback/github
 ```
 
 ### NextAuth
 
 ```env
-NEXTAUTH_URL=http://13.53.127.99:3000
+NEXTAUTH_URL=http://13.60.70.223:3000
 NEXTAUTH_SECRET=your-secret
 ```
 
@@ -353,7 +355,7 @@ http://13.53.127.99:3000
 Backend
 
 ```
-http://13.53.127.99:8000/api/v1
+http://13.60.70.223:8000/api/v1
 ```
 
 Public access via:
