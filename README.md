@@ -247,8 +247,8 @@ EC2 --> Docker[Docker Engine]
 Docker --> Client[zylo-client Container :3000]
 Docker --> Server[zylo-server Container :8000]
 
-Client --> PublicIP[Frontend http://13.53.127.99:3000]
-Server --> PublicAPI[Backend http://13.53.127.99:8000/api/v1]
+Client --> PublicIP[Frontend http://13.60.70.223:3000]
+Server --> PublicAPI[Backend http://13.60.70.223:3000:8000/api/v1]
 ```
 
 ### Request Flow
@@ -384,8 +384,8 @@ http://13.53.127.99:8000/api/v1
 
 Public access via:
 
-http://13.53.127.99:3000
-http://13.53.127.99:8000
+http://13.60.70.223:3000
+http://13.60.70.223:8000
 OAuth must match exact callback URLs
 Domain is optional but recommended for production
 
