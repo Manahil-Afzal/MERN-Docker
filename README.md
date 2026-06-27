@@ -201,39 +201,6 @@ This project is deployed on an AWS EC2 Ubuntu instance where both frontend and b
 
 ---
 
-UserBrowser --> Frontend[EC2 Frontend :3000]
-Frontend --> Backend[EC2 Backend :8000]
-
-Backend --> DB[(MongoDB Atlas)]
-Backend --> Cache[(Redis / Upstash)]
-Backend --> Payments[Stripe]
-Backend --> Media[Cloudinary / VdoCipher]
-Backend --> Email[Nodemailer]
-
----
-
-### Request Flow
-
-```mermaid
-
-User[User Browser]
-
-User --> Frontend[Next.js Frontend]
-
-Frontend --> Backend[Express API]
-
-Backend --> MongoDB[(MongoDB Atlas)]
-
-Backend --> Redis[(Upstash Redis)]
-
-Backend --> Stripe[Stripe]
-
-Backend --> Cloudinary[Cloudinary]
-
-Backend --> VdoCipher[VdoCipher]
-
-Backend --> Nodemailer[Nodemailer]
-```
 
 ## ⚙️ EC2 Container Management
 
