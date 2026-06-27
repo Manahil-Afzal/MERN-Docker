@@ -212,22 +212,6 @@ Backend --> Email[Nodemailer]
 
 ---
 
-## 🐳 Docker Runtime on EC2
-
-### Docker Containers
-
-graph TD
-
-EC2[AWS EC2 Ubuntu Server]
-
-EC2 --> Docker[Docker Engine]
-
-Docker --> Client[zylo-client Container :3000]
-Docker --> Server[zylo-server Container :8000]
-
-Client --> PublicIP[Frontend http://13.60.70.223:3000]
-Server --> PublicAPI[Backend http://13.60.70.223:3000:8000/api/v1]
-
 ### Request Flow
 
 ```mermaid
