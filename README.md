@@ -201,27 +201,6 @@ This project is deployed on an AWS EC2 Ubuntu instance where both frontend and b
 
 ---
 
-## 🐳 Docker Runtime on EC2
-
-```mermaid
-graph TD
-
-EC2[AWS EC2 Ubuntu Server]
-
-EC2 --> Docker[Docker Engine]
-
-Docker --> Client[zylo-client container :3000]
-Docker --> Server[zylo-server container :8000]
-
-Client --> PublicIP[http://13.53.127.99:3000]
-Server --> PublicAPI[http://13.53.127.99:8000/api/v1]
-
----
-
-graph LR
-
-UserBrowser[User Browser]
-
 UserBrowser --> Frontend[EC2 Frontend :3000]
 Frontend --> Backend[EC2 Backend :8000]
 
@@ -237,7 +216,6 @@ Backend --> Email[Nodemailer]
 
 ### Docker Containers
 
-```mermaid
 graph TD
 
 EC2[AWS EC2 Ubuntu Server]
@@ -249,12 +227,8 @@ Docker --> Server[zylo-server Container :8000]
 
 Client --> PublicIP[Frontend http://13.60.70.223:3000]
 Server --> PublicAPI[Backend http://13.60.70.223:3000:8000/api/v1]
-```
 
 ### Request Flow
-
-```mermaid
-graph LR
 
 User[User Browser]
 
